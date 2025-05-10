@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+
 class Config:
     # Database configuration
     DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
@@ -19,4 +20,4 @@ class Config:
             return f"mysql+pymysql://{cls.DB_USER}:{cls.DB_PASSWORD}@{cls.DB_HOST}:{cls.DB_PORT}/{cls.DB_NAME}"
         else:
             # Default to SQLite
-            return f"sqlite:///{cls.DB_NAME}.db" 
+            return f"sqlite:///{cls.DB_NAME}.db"

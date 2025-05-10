@@ -27,6 +27,7 @@ app.add_middleware(
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(groups.router, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 
+
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Psychology API"} 
+    return {"message": "Welcome to Psychology API"}

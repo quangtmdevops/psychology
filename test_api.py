@@ -8,6 +8,7 @@ BASE_URL = "http://localhost:8001"
 MAX_RETRIES = 3
 RETRY_DELAY = 2  # seconds
 
+
 class APITester:
     def __init__(self, base_url: str = BASE_URL):
         self.base_url = base_url
@@ -111,12 +112,13 @@ class APITester:
             except json.JSONDecodeError:
                 print(f"Response: {response.text}")
 
+
 def wait_for_server():
     """Wait for the server to be ready"""
     print("Waiting for server to be ready...")
     for i in range(MAX_RETRIES):
         try:
-            print(f"Attempt {i+1}/{MAX_RETRIES}: Trying to connect to {BASE_URL}/docs")
+            print(f"Attempt {i + 1}/{MAX_RETRIES}: Trying to connect to {BASE_URL}/docs")
             response = requests.get(f"{BASE_URL}/docs")
             if response.status_code == 200:
                 print("Server is ready!")
@@ -125,12 +127,13 @@ def wait_for_server():
                 print(f"Server responded with status code: {response.status_code}")
         except requests.exceptions.ConnectionError as e:
             print(f"Connection error: {str(e)}")
-            print(f"Attempt {i+1}/{MAX_RETRIES}: Server not ready, retrying in {RETRY_DELAY} seconds...")
+            print(f"Attempt {i + 1}/{MAX_RETRIES}: Server not ready, retrying in {RETRY_DELAY} seconds...")
             time.sleep(RETRY_DELAY)
         except Exception as e:
             print(f"Unexpected error: {str(e)}")
             time.sleep(RETRY_DELAY)
     return False
+
 
 def test_register_user() -> Optional[str]:
     """Test user registration and return the user's email if successful"""
@@ -149,6 +152,7 @@ def test_register_user() -> Optional[str]:
     except requests.exceptions.RequestException as e:
         print(f"Registration error: {str(e)}")
         return None
+
 
 def test_login(email: str) -> Optional[str]:
     """Test user login and return the access token if successful"""
@@ -169,6 +173,7 @@ def test_login(email: str) -> Optional[str]:
         print(f"Login error: {str(e)}")
         return None
 
+
 def test_get_groups(token: str):
     """Test getting groups with authentication"""
     print("\n3. Testing Get Groups:")
@@ -180,6 +185,7 @@ def test_get_groups(token: str):
         print(f"Groups: {response.json()}")
     except requests.exceptions.RequestException as e:
         print(f"Get groups error: {str(e)}")
+
 
 def test_create_group(token: str):
     """Test creating a new group"""
@@ -200,31 +206,33 @@ def test_create_group(token: str):
     except requests.exceptions.RequestException as e:
         print(f"Create group error: {str(e)}")
 
+
 def main():
     print("Starting API Tests...")
-    
+
     # Wait for server to be ready
     if not wait_for_server():
         print("Could not connect to server. Please make sure the server is running.")
         sys.exit(1)
-    
+
     # Test registration
     email = test_register_user()
     if not email:
         print("Failed to register user. Stopping tests.")
         sys.exit(1)
-    
+
     # Test login
     token = test_login(email)
     if not token:
         print("Failed to login. Stopping tests.")
         sys.exit(1)
-    
+
     # Test groups endpoints
     test_get_groups(token)
     test_create_group(token)
-    
+
     print("\nAll tests completed!")
+
 
 if __name__ == "__main__":
     main()

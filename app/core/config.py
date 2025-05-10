@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./psychology_db.db"
     SECRET_KEY: str = "your-secret-key-here"
@@ -8,4 +9,5 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
-settings = Settings() 
+
+settings = Settings()
