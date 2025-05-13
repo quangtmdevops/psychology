@@ -1,23 +1,14 @@
+import os
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from config import Config
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Create SQLAlchemy engine
-engine = create_engine(
-    Config.get_database_url(),
-    # Enable SQLite foreign key support
-    connect_args={"check_same_thread": False} if Config.DB_ENGINE == "sqlite" else {}
-)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 
-# Create SessionLocal class
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Create Base class
 Base = declarative_base()
 
-
-# Dependency to get DB session
+# Add this function:
 def get_db():
     db = SessionLocal()
     try:

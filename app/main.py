@@ -11,7 +11,7 @@ from app.schemas.user import UserCreate, UserUpdate, User as UserSchema, Token, 
 from app.schemas.test import TestInDB, TestAnswerCreate, EntityInDB, TestAnswerInDB
 
 # Create database tables
-# Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Psychology API",

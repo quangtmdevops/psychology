@@ -1,66 +1,56 @@
-from pydantic import BaseModel, conint
-from typing import Optional, List
-
-
-class TestAnswerBase(BaseModel):
-    level: conint(ge=1, le=3)
-
-
-class TestAnswerCreate(TestAnswerBase):
-    question_id: int
-
-
-class TestAnswerUpdate(TestAnswerBase):
-    pass
-
-
-class TestAnswerInDB(TestAnswerBase):
-    id: int
-    question_id: int
-
-    class Config:
-        from_attributes = True
-
-
-class EntityBase(BaseModel):
-    content: str
-    reward: int = 0
-
-
-class EntityCreate(EntityBase):
-    question_id: int
-
-
-class EntityUpdate(EntityBase):
-    content: Optional[str] = None
-    reward: Optional[int] = None
-
-
-class EntityInDB(EntityBase):
-    id: int
-    question_id: int
-
-    class Config:
-        from_attributes = True
-
+from pydantic import BaseModel
+from typing import Optional
 
 class TestBase(BaseModel):
     content: str
     order: Optional[int] = None
 
-
 class TestCreate(TestBase):
     pass
 
-
 class TestUpdate(TestBase):
-    content: Optional[str] = None
+    pass
 
-
-class TestInDB(TestBase):
+class TestInDBBase(TestBase):
     id: int
-    answers: List[TestAnswerInDB] = []
-    entities: List[EntityInDB] = []
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
+class TestInDB(TestInDBBase):
+    pass
+
+class TestAnswerBase(BaseModel):
+    level: int
+
+class TestAnswerCreate(TestAnswerBase):
+    pass
+
+class TestAnswerInDBBase(TestAnswerBase):
+    id: int
+    question_id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
+class TestAnswerInDB(TestAnswerInDBBase):
+    pass
+
+class EntityBase(BaseModel):
+    content: str
+    reward: Optional[int] = 0
+
+class EntityCreate(EntityBase):
+    pass
+
+class EntityInDBBase(EntityBase):
+    id: int
+    question_id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
+class EntityInDB(EntityInDBBase):
+    pass 
