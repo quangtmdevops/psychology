@@ -117,3 +117,4 @@ def create_user_token(user: User, scopes: list[str] = None) -> dict:
         "token_type": "bearer",
         "scopes": scopes
     }
+    

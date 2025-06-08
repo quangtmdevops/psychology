@@ -13,6 +13,7 @@ from app.core.auth import (
 from app.models.models import User
 from app.schemas.user import UserCreate, UserUpdate, User as UserSchema, Token, UserLogin
 from datetime import timedelta
+import json
 
 router = APIRouter(
     prefix="/users",
@@ -20,141 +21,53 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/register",
-    response_model=UserSchema,
-    status_code=status.HTTP_201_CREATED,
-    responses={
-        201: {"description": "User created successfully", "model": UserSchema},
-        400: {"description": "Email already registered"},
-        422: {"description": "Validation error"}
+def build_user_response(user):
+    return {
+        "id": str(user.id),
+        "username": user.username or user.email,
+        "displayName": user.display_name or (user.email.split("@")[0] if user.email else None),
+        "dob": user.dob,
+        "attendances": json.loads(user.attendances) if user.attendances else [0, 0, 0, 0, 0, 0, 0],
+        "image": user.image,
+        "stars": user.stars if hasattr(user, "stars") else 0,
+        "isPremium": user.is_premium,
+        "freeChat": user.free_chat if hasattr(user, "free_chat") else 0
     }
-)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    """
-    Register a new user.
-    
-    - **email**: User's email address
-    - **password**: User's password (minimum 8 characters)
-    """
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
-        email=user.email,
-        password=hashed_password,
-        is_premium=False,
-        reward=0,
-        is_active=True
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-
-@router.post(
-    "/token",
-    response_model=Token,
-    tags=["authentication"],
-    responses={
-        200: {"description": "Token generated successfully", "model": Token},
-        401: {"description": "Invalid credentials"},
-        422: {"description": "Validation error"}
-    }
-)
-def login_for_access_token(user: UserLogin, db: Session = Depends(get_db)):
-    """
-    Get access token for authentication.
-    
-    Use this endpoint to get a JWT token that you can use to authenticate other API requests.
-    The token should be included in the Authorization header as: `Bearer <token>`
-    
-    - **email**: User's email address
-    - **password**: User's password (minimum 8 characters)
-    """
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if not db_user or not verify_password(user.password, db_user.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # Create token with appropriate scopes
-    scopes = ["users:read"]
-    if db_user.is_premium:
-        scopes.extend(["users:write", "users:delete"])
-    
-    return create_user_token(db_user, scopes)
-
-
-@router.get(
-    "/me",
-    response_model=UserSchema,
-    responses={
-        200: {"description": "Current user information", "model": UserSchema},
-        401: {"description": "Not authenticated"},
-        403: {"description": "Not enough permissions"}
-    }
-)
-async def read_users_me(
-    current_user: User = Security(get_current_user, scopes=["users:read"])
-):
-    """
-    Get current user's information.
-    
-    Requires authentication token with 'users:read' scope.
-    """
-    return current_user
-
 
 @router.get(
     "/",
-    response_model=List[UserSchema],
     responses={
-        200: {"description": "List of users", "model": List[UserSchema]},
-        401: {"description": "Not authenticated"},
-        403: {"description": "Not enough permissions"}
+        200: {"description": "List of users"},
     }
 )
 async def read_users(
-    skip: int = 0,
-    limit: int = 100,
-    current_user: User = Security(get_current_user, scopes=["users:read"]),
-    db: Session = Depends(get_db)
+        skip: int = 0,
+        limit: int = 100,
+        db: Session = Depends(get_db)
 ):
     """
     Get list of users.
-    
-    Requires authentication token with 'users:read' scope.
     
     - **skip**: Number of records to skip
     - **limit**: Maximum number of records to return
     """
     users = db.query(User).offset(skip).limit(limit).all()
-    return users
+    return {"users": [build_user_response(u) for u in users]}
 
 
 @router.get(
     "/{user_id}",
-    response_model=UserSchema,
     responses={
-        200: {"description": "User information", "model": UserSchema},
+        200: {"description": "User information"},
         401: {"description": "Not authenticated"},
         403: {"description": "Not enough permissions"},
         404: {"description": "User not found"}
     }
 )
 async def read_user(
-    user_id: int,
-    current_user: User = Security(get_current_user, scopes=["users:read"]),
-    db: Session = Depends(get_db)
+        user_id: int,
+        current_user: User = Security(get_current_user, scopes=["users:read"]),
+        db: Session = Depends(get_db)
 ):
     """
     Get user by ID.
@@ -166,83 +79,83 @@ async def read_user(
     db_user = db.query(User).filter(User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+    return {"user": build_user_response(db_user)}
 
 
 @router.put(
-    "/{user_id}",
-    response_model=UserSchema,
+    "/",
     responses={
-        200: {"description": "User updated successfully", "model": UserSchema},
+        200: {"description": "User updated successfully"},
         401: {"description": "Not authenticated"},
-        403: {"description": "Not enough permissions or not authorized to update this user"},
         404: {"description": "User not found"},
         422: {"description": "Validation error"}
     }
 )
 async def update_user(
-    user_id: int,
-    user: UserUpdate,
-    current_user: User = Security(get_current_user, scopes=["users:write"]),
-    db: Session = Depends(get_db)
+        user: UserUpdate,  # user is the user object from the request body
+        current_user: User = Security(get_current_user, scopes=["users:read"]), # current_user is the user object from token was passed in the header 
+        db: Session = Depends(get_db)
 ):
     """
-    Update user information.
+    Update current user's information.
     
-    Requires authentication token with 'users:write' scope.
-    Users can only update their own information.
-    
-    - **user_id**: ID of the user to update
     - **user**: Updated user information
     """
-    db_user = db.query(User).filter(User.id == user_id).first()
+    print("Received update data:", user.model_dump())
+    db_user = db.query(User).filter(User.id == current_user.id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if current_user.id != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized to update this user")
+    # Convert the update data to match database field names
+    update_data = {}
+    if user.displayName:
+        update_data["displayName"] = user.displayName
+    if user.dob is not None:
+        update_data["dob"] = user.dob
+    if user.image is not None:
+        update_data["image"] = user.image
+    if user.isPremium is not None:
+        update_data["isPremium"] = user.isPremium
 
-    update_data = user.model_dump(exclude_unset=True)
-    if "password" in update_data:
-        update_data["password"] = get_password_hash(update_data["password"])
-
+    print("Processed update data:", update_data)
+    
+    # Update the user object with new values
     for key, value in update_data.items():
         setattr(db_user, key, value)
 
     db.commit()
     db.refresh(db_user)
-    return db_user
+    return {"user": update_data}
 
 
 @router.delete(
-    "/{user_id}",
+    "/",
     responses={
         200: {"description": "User deleted successfully"},
         401: {"description": "Not authenticated"},
-        403: {"description": "Not enough permissions or not authorized to delete this user"},
-        404: {"description": "User not found"}
+        404: {"description": "User not found"},
+        422: {"description": "Validation error"}
     }
 )
 async def delete_user(
-    user_id: int,
-    current_user: User = Security(get_current_user, scopes=["users:delete"]),
-    db: Session = Depends(get_db)
+        current_user: User = Security(get_current_user, scopes=["users:read"]),
+        db: Session = Depends(get_db)
 ):
     """
-    Delete a user.
+    Delete current user's information.
     
-    Requires authentication token with 'users:delete' scope.
-    Users can only delete their own account.
-    
-    - **user_id**: ID of the user to delete
+    - **user**: Updated user information
     """
-    db_user = db.query(User).filter(User.id == user_id).first()
+    
+    db_user = db.query(User).filter(User.id == current_user.id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
+    
 
-    if current_user.id != user_id:
+    if current_user.id != db_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to delete this user")
 
     db.delete(db_user)
     db.commit()
     return {"message": "User deleted successfully"}
+

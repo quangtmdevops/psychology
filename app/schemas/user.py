@@ -28,7 +28,7 @@ class User(UserBase):
             "example": {
                 "id": 1,
                 "email": "user@example.com",
-                "is_premium": False,
+                "isPremium": False,
                 "reward": 0,
                 "is_active": True
             }
@@ -36,16 +36,19 @@ class User(UserBase):
 
 
 class UserUpdate(BaseModel):
-    email: Optional[EmailStr] = Field(None, example="newemail@example.com")
-    password: Optional[str] = Field(None, min_length=8, example="newpassword123")
-    is_premium: Optional[bool] = Field(None, example=True)
+    
+    displayName: Optional[str] = Field(None, example="John Doe")
+    dob: Optional[str] = Field(None, example="01/01/2000")
+    image: Optional[str] = Field(None, example="https://example.com/image.jpg")
+    isPremium: Optional[bool] = Field(None, example=True)
 
     class Config:
         json_schema_extra = {
             "example": {
-                "email": "newemail@example.com",
-                "password": "newpassword123",
-                "is_premium": True
+                "displayName": "John Doe",
+                "dob": "01/01/2000",
+                "image": "https://example.com/image.jpg",
+                "isPremium": True
             }
         }
 

@@ -6,7 +6,14 @@ CREATE TABLE user (
     id INT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     reward INT DEFAULT 0,
-    isPremium BOOLEAN DEFAULT FALSE
+    isPremium BOOLEAN DEFAULT FALSE,
+    username VARCHAR(255) NOT NULL,
+    displayName VARCHAR(255),
+    dob VARCHAR(255),
+    attendances VARCHAR(255),
+    image VARCHAR(255),
+    stars INT DEFAULT 0,
+    freeChat INT DEFAULT 0
 );
 
 -- Bảng group (chủ đề lớn)

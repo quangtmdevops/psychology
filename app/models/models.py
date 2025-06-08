@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
 
+# models for design schema of database
 
 class User(Base):
     __tablename__ = 'users'
@@ -17,13 +18,22 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
+    # New fields for API response compatibility
+    username = Column(String, unique=True, index=True, nullable=True)  # Username for login/display
+    display_name = Column(String, nullable=True)  # Display name
+    dob = Column(String, nullable=True)  # Date of birth (format: dd/mm/yyyy)
+    attendances = Column(String, default='[0,0,0,0,0,0,0]')  # JSON string for attendance array
+    image = Column(String, nullable=True)  # Profile image URL
+    stars = Column(Integer, default=0)  # Total stars earned
+    free_chat = Column(Integer, default=0)  # Free chat count
+
     # Relationships
     posts = relationship("Post", back_populates="author")
     test_answers = relationship("TestAnswer", back_populates="user")
     entities = relationship("Entity", back_populates="user")
 
     def __repr__(self):
-        return f"<User(id={self.id}, email='{self.email}', is_premium={self.is_premium})>"
+        return f"<User(id={self.id}, email='{self.email}', username='{self.username}', display_name='{self.display_name}', dob='{self.dob}', attendances='{self.attendances}', image='{self.image}', stars={self.stars}, is_premium={self.is_premium}, free_chat={self.free_chat})>"
 
     def __str__(self):
         return f"User {self.email}"
@@ -82,6 +92,22 @@ class SituationalQuestion(Base):
 
     def __str__(self):
         return f"Question Level {self.level}"
+
+class SituationalAnswer(Base):
+    __tablename__ = 'situational_answer'
+
+    id = Column(Integer, primary_key=True)
+    question_id = Column(Integer, ForeignKey('situational_question.id', ondelete='CASCADE'), nullable=False)
+    content = Column(Text, nullable=False)
+    is_correct = Column(Boolean, default=False)
+
+    question = relationship("SituationalQuestion", backref="answers")
+
+    def __repr__(self):
+        return f"<SituationalAnswer(id={self.id}, question_id={self.question_id}, is_correct={self.is_correct})>"
+
+    def __str__(self):
+        return f"Answer: {self.content[:30]}..."
 
 
 class Post(Base):

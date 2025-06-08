@@ -4,13 +4,13 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.security import OAuth2PasswordBearer
 from app.core.database import engine, Base
-from app.routers import users, groups, posts, test
+from app.routers import users, groups, posts, test, auth
 from app.core.auth import get_current_user
 from app.models.models import User
 from app.schemas.user import UserCreate, UserUpdate, User as UserSchema, Token, UserLogin
 from app.schemas.test import TestInDB, TestAnswerCreate, EntityInDB, TestAnswerInDB
 
-# Create database tables
+# Create database tables for the first time
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -54,6 +54,7 @@ app.include_router(users, prefix="/api/v1")
 app.include_router(groups, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(posts, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(test, prefix="/api/v1", dependencies=[Depends(get_current_user)])
+app.include_router(auth.router, prefix="/api/v1")
 
 
 # Custom OpenAPI schema with security scheme
