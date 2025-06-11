@@ -1,0 +1,887 @@
+{
+  "total_questions": 42,
+  "questions": [
+    {
+      "content": "Tôi thấy mình hay bối rối trước những việc chẳng đâu vào đâu",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi hay bị khô miệng",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi dường như chẳng có chút cảm xúc tích cực nào",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi bị rối loạn nhịp thở (thở gấp, khó thở dù chẳng làm việc gì nặng)",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi dường như không thể làm việc như trước được",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi có xu hướng phản ứng thái quá với mọi tình huống",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi có cảm giác bị run (tay, chân…)",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy khó thư giãn được",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi đã rơi vào sự việc khiến tôi rất lo lắng và tôi chỉ dịu lại khi sự việc đó đã qua đi",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy mình chẳng có gì để mong đợi cả",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi khá dễ bị bối rối",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy mình đang suy nghĩ quá nhiều",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi cảm thấy buồn chán, trì trệ",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy mình không thể kiên nhẫn được khi phải chờ đợi",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy mình gần như bị ngất",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi mất hứng thú với mọi việc",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi cảm thấy mình chẳng đáng làm người",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi khá dễ phật ý, tự ái",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi bị đổ mồ hôi dù chẳng vì làm việc nặng hay do trời nóng",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi hay sợ vô cớ",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy cuộc sống không có gì đáng giá cả",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy khó mà thoải mái được",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy khó nuốt",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi dường như chẳng thấy có chút hứng thú nào từ những việc mà tôi đã làm",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi nhận thấy tim mình đập dù không làm việc gì nặng nhọc (nhịp tim tăng, tim mất nhịp)",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi cảm thấy chán nản, thất vọng",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi dễ cáu kỉnh, bực bội",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy mình gần như hoảng loạn",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Sau khi bị bối rối tôi thấy khó mà trấn tĩnh lại được",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi sợ phải làm những việc tuy bình thường nhưng trước đây tôi chưa từng làm",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi không thấy hào hứng với bất kỳ việc gì nữa",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy khó chấp nhận việc đang làm bị gián đoạn",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi sống trong tình trạng căng thẳng",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy mình khá là vô tích sự",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi không chấp nhận được việc là có cái gì đó xen vào cản trở việc tôi đang làm",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi cảm thấy khiếp sợ",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi chẳng thấy có hy vọng gì ở tương lai cả",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy cuộc sống vô nghĩa",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi dễ bị kích động",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi lo lắng về những tình huống có thể làm tôi hoảng sợ hoặc biến tôi thành trò cười",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi bị run",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    },
+    {
+      "content": "Tôi thấy khó bắt tay vào công việc",
+      "options": [
+        {
+          "level": 0,
+          "content": "Không đúng với tôi chút nào cả"
+        },
+        {
+          "level": 1,
+          "content": "Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng"
+        },
+        {
+          "level": 2,
+          "content": "Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng"
+        },
+        {
+          "level": 3,
+          "content": "Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng"
+        }
+      ]
+    }
+  ]
+}

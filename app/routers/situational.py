@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from app.core.database import get_db
 from app.models.models import SituationalQuestion, SituationalUserAnswer
 from sqlalchemy.orm import Session
+from app.services.situational_service import SituationalService, SubmitAnswerIn
 
 router = APIRouter(prefix="/situational", tags=["situational"])
 
@@ -28,10 +29,6 @@ class SituationOut(BaseModel):
     explanation: str
     answers: List[AnswerOut]
     
-class SubmitAnswerIn(BaseModel):
-    situationalId: str
-    answerId: str
-
 class StarsOut(BaseModel):
     stars: int
     
@@ -62,61 +59,28 @@ USER_STARS = {
 }
 
 # 1. GET /progress?group=0/1/2/3
-@router.get("/progress", response_model=List[ProgressOut])
+@router.get("/progress", response_model=List[SituationalService.ProgressOut])
 def get_progress(
     group: Optional[List[int]] = Query(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    if not group:
-        group = [0, 1, 2, 3]
-    result = []
-    for g in group:
-        # Total questions in this group
-        total = db.query(SituationalQuestion).filter(SituationalQuestion.group == g).count()
-        # Answered questions in this group by the user
-        answered = (
-            db.query(SituationalUserAnswer)
-            .join(SituationalQuestion, SituationalUserAnswer.question_id == SituationalQuestion.id)
-            .filter(
-                SituationalUserAnswer.user_id == current_user.id,
-                SituationalQuestion.group == g
-            )
-            .count()
-        )
-        result.append(ProgressOut(level=g, current=answered, total=total))
-    return result
+    return SituationalService.get_progress(group, current_user, db)
 
 # 2. GET /?group=0/1/2/3&level=0/1/2
-@router.get("/", response_model=List[SituationOut])
+@router.get("/", response_model=List[SituationalService.SituationOut])
 def get_situations(
     group: Optional[List[int]] = Query(None),
     level: Optional[List[int]] = Query(None),
     current_user: User = Depends(get_current_user)
 ):
-    # In real code, filter situations by group and level from DB
-    # Here, return all dummy situations
-    return SITUATIONS
+    return SituationalService.get_situations(group, level, current_user)
 
 # 3. POST /
-@router.post("/", response_model=StarsOut)
+@router.post("/", response_model=SituationalService.StarsOut)
 def submit_answers(
     answers: List[SubmitAnswerIn],
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    stars_earned = 0
-    for ans in answers:
-        # Fetch the correct answer from the DB
-        correct_answer = db.query(SituationalAnswer).filter(
-            SituationalAnswer.question_id == ans.situationalId,
-            SituationalAnswer.id == ans.answerId,
-            SituationalAnswer.is_correct == True
-        ).first()
-        if correct_answer:
-            stars_earned += 1
-
-    # Update user's stars in DB
-    current_user.stars = (current_user.stars or 0) + stars_earned
-    db.commit()
-    return {"stars": current_user.stars}
+    return SituationalService.submit_answers(answers, current_user, db)

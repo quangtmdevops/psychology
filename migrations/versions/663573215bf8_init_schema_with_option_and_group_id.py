@@ -1,8 +1,8 @@
-"""init
+"""init schema with option and group_id
 
-Revision ID: 83e3c8283350
+Revision ID: 663573215bf8
 Revises: 
-Create Date: 2025-05-10 13:01:14.197966
+Create Date: 2025-06-11 22:33:02.526968
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '83e3c8283350'
+revision: str = '663573215bf8'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -26,34 +26,27 @@ def upgrade() -> None:
     sa.Column('description', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('test',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('order', sa.Integer(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('email', sa.String(), nullable=False),
-    sa.Column('password', sa.String(), nullable=False),
-    sa.Column('is_premium', sa.Boolean(), nullable=False, server_default='0'),
-    sa.Column('reward', sa.Integer(), nullable=False, server_default='0'),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('email', sa.String(), nullable=True),
+    sa.Column('password', sa.String(), nullable=True),
+    sa.Column('is_premium', sa.Boolean(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('reward', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('username', sa.String(), nullable=True),
+    sa.Column('display_name', sa.String(), nullable=True),
+    sa.Column('dob', sa.String(), nullable=True),
+    sa.Column('attendances', sa.String(), nullable=True),
+    sa.Column('image', sa.String(), nullable=True),
+    sa.Column('stars', sa.Integer(), nullable=True),
+    sa.Column('free_chat', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
-    op.create_table('entity',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('question_id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('reward', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['question_id'], ['test.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
-    )
+    op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
     op.create_table('post',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
@@ -82,6 +75,40 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['group_id'], ['group.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('test',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('order', sa.Integer(), nullable=True),
+    sa.Column('group_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['group_id'], ['group.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('entity',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('question_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('reward', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['question_id'], ['test.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('option',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('test_id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('level', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['test_id'], ['test.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('situational_answer',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('question_id', sa.Integer(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('is_correct', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['question_id'], ['situational_question.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('test_answer',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('question_id', sa.Integer(), nullable=False),
@@ -94,17 +121,33 @@ def upgrade() -> None:
     )
     # ### end Alembic commands ###
 
+    # Sau khi tạo bảng, nạp dữ liệu từ file .docx
+    from app.services.question_service import QuestionService
+    from app.core.database import SessionLocal
+    db = SessionLocal()
+    try:
+        QuestionService.import_all_questions(db)
+        print("Import questions completed successfully!")
+    except Exception as e:
+        print(f"Error importing questions: {str(e)}")
+        raise
+    finally:
+        db.close()
+
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('test_answer')
+    op.drop_table('situational_answer')
+    op.drop_table('option')
+    op.drop_table('entity')
+    op.drop_table('test')
     op.drop_table('sub_group')
     op.drop_table('situational_question')
     op.drop_table('post')
-    op.drop_table('entity')
+    op.drop_index(op.f('ix_users_username'), table_name='users')
     op.drop_index(op.f('ix_users_id'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
-    op.drop_table('test')
     op.drop_table('group')
     # ### end Alembic commands ###

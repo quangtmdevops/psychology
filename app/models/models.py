@@ -1,13 +1,23 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, Boolean, ForeignKey, DateTime, CheckConstraint
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    Boolean,
+    ForeignKey,
+    DateTime,
+    CheckConstraint,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
 
 # models for design schema of database
 
+
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
@@ -19,10 +29,14 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # New fields for API response compatibility
-    username = Column(String, unique=True, index=True, nullable=True)  # Username for login/display
+    username = Column(
+        String, unique=True, index=True, nullable=True
+    )  # Username for login/display
     display_name = Column(String, nullable=True)  # Display name
     dob = Column(String, nullable=True)  # Date of birth (format: dd/mm/yyyy)
-    attendances = Column(String, default='[0,0,0,0,0,0,0]')  # JSON string for attendance array
+    attendances = Column(
+        String, default="[0,0,0,0,0,0,0]"
+    )  # JSON string for attendance array
     image = Column(String, nullable=True)  # Profile image URL
     stars = Column(Integer, default=0)  # Total stars earned
     free_chat = Column(Integer, default=0)  # Free chat count
@@ -40,7 +54,7 @@ class User(Base):
 
 
 class Group(Base):
-    __tablename__ = 'group'
+    __tablename__ = "group"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
@@ -57,10 +71,12 @@ class Group(Base):
 
 
 class SubGroup(Base):
-    __tablename__ = 'sub_group'
+    __tablename__ = "sub_group"
 
     id = Column(Integer, primary_key=True)
-    group_id = Column(Integer, ForeignKey('group.id', ondelete='CASCADE'), nullable=False)
+    group_id = Column(
+        Integer, ForeignKey("group.id", ondelete="CASCADE"), nullable=False
+    )
     name = Column(String(255), nullable=False)
     description = Column(Text)
 
@@ -74,18 +90,18 @@ class SubGroup(Base):
 
 
 class SituationalQuestion(Base):
-    __tablename__ = 'situational_question'
+    __tablename__ = "situational_question"
 
     id = Column(Integer, primary_key=True)
-    group_id = Column(Integer, ForeignKey('group.id', ondelete='CASCADE'), nullable=False)
+    group_id = Column(
+        Integer, ForeignKey("group.id", ondelete="CASCADE"), nullable=False
+    )
     content = Column(Text, nullable=False)
     level = Column(Integer)
 
     group = relationship("Group", back_populates="situational_questions")
 
-    __table_args__ = (
-        CheckConstraint('level IN (1, 2, 3)', name='check_level_values'),
-    )
+    __table_args__ = (CheckConstraint("level IN (1, 2, 3)", name="check_level_values"),)
 
     def __repr__(self):
         return f"<SituationalQuestion(id={self.id}, level={self.level})>"
@@ -93,11 +109,16 @@ class SituationalQuestion(Base):
     def __str__(self):
         return f"Question Level {self.level}"
 
+
 class SituationalAnswer(Base):
-    __tablename__ = 'situational_answer'
+    __tablename__ = "situational_answer"
 
     id = Column(Integer, primary_key=True)
-    question_id = Column(Integer, ForeignKey('situational_question.id', ondelete='CASCADE'), nullable=False)
+    question_id = Column(
+        Integer,
+        ForeignKey("situational_question.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     content = Column(Text, nullable=False)
     is_correct = Column(Boolean, default=False)
 
@@ -111,7 +132,7 @@ class SituationalAnswer(Base):
 
 
 class Post(Base):
-    __tablename__ = 'post'
+    __tablename__ = "post"
 
     id = Column(Integer, primary_key=True)
     title = Column(String(255), nullable=False)
@@ -119,7 +140,9 @@ class Post(Base):
     audio = Column(Text)
     image = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
-    author_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    author_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     # Relationship
     author = relationship("User", back_populates="posts")
@@ -132,12 +155,15 @@ class Post(Base):
 
 
 class Test(Base):
-    __tablename__ = 'test'
+    __tablename__ = "test"
 
     id = Column(Integer, primary_key=True)
     content = Column(Text, nullable=False)
     order = Column(Integer)
+    group_id = Column(Integer, ForeignKey("group.id"), nullable=False)
 
+    group = relationship("Group", backref="tests")
+    options = relationship("Option", back_populates="test")
     answers = relationship("TestAnswer", back_populates="test")
     entities = relationship("Entity", back_populates="test")
 
@@ -149,18 +175,22 @@ class Test(Base):
 
 
 class TestAnswer(Base):
-    __tablename__ = 'test_answer'
+    __tablename__ = "test_answer"
 
     id = Column(Integer, primary_key=True)
-    question_id = Column(Integer, ForeignKey('test.id', ondelete='CASCADE'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    question_id = Column(
+        Integer, ForeignKey("test.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     level = Column(Integer)
 
     test = relationship("Test", back_populates="answers")
     user = relationship("User", back_populates="test_answers")
 
     __table_args__ = (
-        CheckConstraint('level >= 1 AND level <= 3', name='check_answer_level_range'),
+        CheckConstraint("level >= 1 AND level <= 3", name="check_answer_level_range"),
     )
 
     def __repr__(self):
@@ -171,11 +201,15 @@ class TestAnswer(Base):
 
 
 class Entity(Base):
-    __tablename__ = 'entity'
+    __tablename__ = "entity"
 
     id = Column(Integer, primary_key=True)
-    question_id = Column(Integer, ForeignKey('test.id', ondelete='CASCADE'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    question_id = Column(
+        Integer, ForeignKey("test.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     content = Column(Text, nullable=False)
     reward = Column(Integer, default=0)
 
@@ -187,3 +221,20 @@ class Entity(Base):
 
     def __str__(self):
         return f"Entity: {self.content[:30]}..."
+
+
+class Option(Base):
+    __tablename__ = "option"
+
+    id = Column(Integer, primary_key=True)
+    test_id = Column(Integer, ForeignKey("test.id", ondelete="CASCADE"), nullable=False)
+    content = Column(Text, nullable=False)
+    level = Column(Integer, nullable=False)
+
+    test = relationship("Test", back_populates="options")
+
+    def __repr__(self):
+        return f"<Option(id={self.id}, test_id={self.test_id}, level={self.level})>"
+
+    def __str__(self):
+        return f"Option: {self.content[:30]}..."
