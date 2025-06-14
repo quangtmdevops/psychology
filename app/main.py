@@ -7,8 +7,16 @@ from app.core.database import engine, Base
 from app.routers import users, groups, posts, test, auth
 from app.core.auth import get_current_user
 from app.models.models import User
-from app.schemas.user import UserCreate, UserUpdate, User as UserSchema, Token, UserLogin
+from app.schemas.user import (
+    UserCreate,
+    UserUpdate,
+    User as UserSchema,
+    Token,
+    UserLogin,
+)
 from app.schemas.test import TestInDB, TestAnswerCreate, EntityInDB, TestAnswerInDB
+from app.routers.attendance import router as attendance_router
+from app.routers.situational import router as situational_router
 
 # Create database tables for the first time
 Base.metadata.create_all(bind=engine)
@@ -37,7 +45,7 @@ app = FastAPI(
     """,
     version="1.0.0",
     docs_url=None,  # Disable default docs
-    redoc_url=None  # Disable default redoc
+    redoc_url=None,  # Disable default redoc
 )
 
 # Configure CORS
@@ -55,20 +63,22 @@ app.include_router(groups, prefix="/api/v1", dependencies=[Depends(get_current_u
 app.include_router(posts, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(test, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(attendance_router, prefix="/api/v1")
+app.include_router(situational_router, prefix="/api/v1")
 
 
 # Custom OpenAPI schema with security scheme
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
-    
+
     openapi_schema = get_openapi(
         title=app.title,
         version=app.version,
         description=app.description,
         routes=app.routes,
     )
-    
+
     # Add security scheme only, let FastAPI handle schemas
     openapi_schema.setdefault("components", {})
     openapi_schema["components"]["securitySchemes"] = {
@@ -83,33 +93,29 @@ def custom_openapi():
             1. Register at `/api/v1/users/register`
             2. Get token at `/api/v1/users/token`
             3. Use the token in the Authorization header
-            """
+            """,
         }
     }
-    
+
     # Add global security requirement
     openapi_schema["security"] = [{"Bearer": []}]
-    
+
     # Add example request bodies
     openapi_schema["components"]["examples"] = {
         "UserRegistration": {
-            "value": {
-                "email": "user@example.com",
-                "password": "password123"
-            }
+            "value": {"email": "user@example.com", "password": "password123"}
         },
         "UserLogin": {
-            "value": {
-                "email": "user@example.com",
-                "password": "password123"
-            }
-        }
+            "value": {"email": "user@example.com", "password": "password123"}
+        },
     }
-    
+
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
+
 app.openapi = custom_openapi
+
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -129,17 +135,20 @@ async def custom_swagger_ui_html():
             "persistAuthorization": True,
             "displayRequestDuration": True,
             "tryItOutEnabled": True,
-        }
+        },
     )
+
 
 @app.get("/")
 async def root():
     return {"message": "Welcome to Psychology API"}
 
+
 def admin_required(current_user: User = Depends(get_current_user)):
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Admin only")
     return current_user
+
 
 def premium_required(current_user: User = Depends(get_current_user)):
     if not current_user.is_premium:

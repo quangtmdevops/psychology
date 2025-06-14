@@ -43,7 +43,6 @@ class User(Base):
 
     # Relationships
     posts = relationship("Post", back_populates="author")
-    test_answers = relationship("TestAnswer", back_populates="user")
     entities = relationship("Entity", back_populates="user")
 
     def __repr__(self):
@@ -178,26 +177,17 @@ class TestAnswer(Base):
     __tablename__ = "test_answer"
 
     id = Column(Integer, primary_key=True)
-    question_id = Column(
-        Integer, ForeignKey("test.id", ondelete="CASCADE"), nullable=False
-    )
-    user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
-    level = Column(Integer)
+    test_id = Column(Integer, ForeignKey("test.id", ondelete="CASCADE"), nullable=False)
+    option_id = Column(Integer, ForeignKey("option.id", ondelete="CASCADE"), nullable=False)
 
     test = relationship("Test", back_populates="answers")
-    user = relationship("User", back_populates="test_answers")
-
-    __table_args__ = (
-        CheckConstraint("level >= 1 AND level <= 3", name="check_answer_level_range"),
-    )
+    option = relationship("Option")
 
     def __repr__(self):
-        return f"<TestAnswer(id={self.id}, level={self.level})>"
+        return f"<TestAnswer(id={self.id}, test_id={self.test_id}, option_id={self.option_id})>"
 
     def __str__(self):
-        return f"Answer Level {self.level}"
+        return f"TestAnswer: test_id={self.test_id}, option_id={self.option_id}"
 
 
 class Entity(Base):
@@ -238,3 +228,18 @@ class Option(Base):
 
     def __str__(self):
         return f"Option: {self.content[:30]}..."
+
+
+class SituationalUserAnswer(Base):
+    __tablename__ = "situational_user_answer"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    question_id = Column(Integer, ForeignKey("situational_question.id", ondelete="CASCADE"), nullable=False)
+    answer_id = Column(Integer, ForeignKey("situational_answer.id", ondelete="CASCADE"), nullable=False)
+
+    def __repr__(self):
+        return f"<SituationalUserAnswer(id={self.id}, user_id={self.user_id}, question_id={self.question_id}, answer_id={self.answer_id})>"
+
+    def __str__(self):
+        return f"SituationalUserAnswer: user_id={self.user_id}, question_id={self.question_id}, answer_id={self.answer_id}"

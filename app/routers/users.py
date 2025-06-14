@@ -14,6 +14,7 @@ from app.models.models import User
 from app.schemas.user import UserCreate, UserUpdate, User as UserSchema, Token, UserLogin
 from datetime import timedelta
 import json
+from pydantic import BaseModel
 
 router = APIRouter(
     prefix="/users",
@@ -82,50 +83,38 @@ async def read_user(
     return {"user": build_user_response(db_user)}
 
 
-@router.put(
-    "/",
-    responses={
-        200: {"description": "User updated successfully"},
-        401: {"description": "Not authenticated"},
-        404: {"description": "User not found"},
-        422: {"description": "Validation error"}
-    }
-)
-async def update_user(
-        user: UserUpdate,  # user is the user object from the request body
-        current_user: User = Security(get_current_user, scopes=["users:read"]), # current_user is the user object from token was passed in the header 
-        db: Session = Depends(get_db)
+class UserUpdateIn(BaseModel):
+    displayName: str = None
+    dob: str = None
+    image: str = None
+    isPremium: bool = None
+
+@router.put("/", response_model=dict)
+def update_user(
+    user_update: UserUpdateIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """
-    Update current user's information.
-    
-    - **user**: Updated user information
-    """
-    print("Received update data:", user.model_dump())
-    db_user = db.query(User).filter(User.id == current_user.id).first()
-    if db_user is None:
+    user = db.query(User).filter(User.id == current_user.id).first()
+    if not user:
         raise HTTPException(status_code=404, detail="User not found")
-
-    # Convert the update data to match database field names
-    update_data = {}
-    if user.displayName:
-        update_data["displayName"] = user.displayName
-    if user.dob is not None:
-        update_data["dob"] = user.dob
-    if user.image is not None:
-        update_data["image"] = user.image
-    if user.isPremium is not None:
-        update_data["isPremium"] = user.isPremium
-
-    print("Processed update data:", update_data)
-    
-    # Update the user object with new values
-    for key, value in update_data.items():
-        setattr(db_user, key, value)
-
+    if user_update.displayName is not None:
+        user.display_name = user_update.displayName
+    if user_update.dob is not None:
+        user.dob = user_update.dob
+    if user_update.image is not None:
+        user.image = user_update.image
+    if user_update.isPremium is not None:
+        user.is_premium = user_update.isPremium
     db.commit()
-    db.refresh(db_user)
-    return {"user": update_data}
+    db.refresh(user)
+    return {
+        "id": user.id,
+        "displayName": user.display_name,
+        "dob": user.dob,
+        "image": user.image,
+        "isPremium": user.is_premium
+    }
 
 
 @router.delete(
