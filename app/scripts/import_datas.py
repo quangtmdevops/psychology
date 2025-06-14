@@ -11,7 +11,7 @@ def main():
         print(f"Error importing questions: {str(e)}")
         
     try: 
-        SituationalService.import_situational_from_files(db,r"E:\quangtm\AS_IT\Projects\AS_product_project\psychology\app\data\situation")
+        SituationalService.import_situational_from_files(db)
         print("Import situational questions completed successfully!")
     except Exception as e:
         print(f"Error importing situational questions: {str(e)}")

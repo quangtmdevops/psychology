@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:15
@@ -8,7 +10,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: psychology
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     expose:
       - "5432"
     networks:
@@ -20,7 +22,7 @@ services:
       retries: 5
       start_period: 10s
 
-  api:
+  web:
     image: psychology-api
     build:
       context: .
@@ -31,8 +33,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./app/data/situational:/app/app/data/situational
     environment:
-      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/psychology
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/psychology
     networks:
       - psychology_net
 

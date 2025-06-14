@@ -9,6 +9,7 @@ from app.models.models import (
     SituationalAnswer,
     User,
     SituationalUserAnswer,
+    Group,
 )
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
@@ -19,11 +20,34 @@ class SituationalService:
     # ... các hàm khác ...
 
     @staticmethod
-    def read_situational_from_files(directory: str) -> List[Dict[str, Any]]:
+    def ensure_groups_exist(db: Session) -> None:
         """
-        Đọc các file docx trong thư mục, trích xuất dữ liệu và trả về list dict.
+        Đảm bảo các groups cần thiết đã tồn tại trong database
+        """
+        groups = [
+            Group(id=1, name="Bạn bè", description="Các tình huống liên quan đến bạn bè"),
+            Group(id=2, name="Thầy cô", description="Các tình huống liên quan đến thầy cô"),
+            Group(id=3, name="Cha mẹ", description="Các tình huống liên quan đến cha mẹ"),
+            Group(id=4, name="Anh em", description="Các tình huống liên quan đến anh em"),
+        ]
+
+        for group in groups:
+            existing_group = db.query(Group).filter(Group.id == group.id).first()
+            if not existing_group:
+                db.add(group)
+        
+        db.commit()
+
+    @staticmethod
+    def read_situational_from_files() -> List[Dict[str, Any]]:
+        """
+        Đọc các file docx trong thư mục mặc định, trích xuất dữ liệu và trả về list dict.
         """
         data = []
+        # Đường dẫn mặc định tới thư mục chứa file situational
+        directory = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'situation')
+        if not os.path.exists(directory):
+            return data  # hoặc raise Exception nếu muốn báo lỗi
         for filename in os.listdir(directory):
             if not filename.endswith(".docx"):
                 continue
@@ -37,13 +61,13 @@ class SituationalService:
             group_id = None
             lowered_filename = filename.lower()
             if "bạn bè" in lowered_filename:
-                group_id = 0
+                group_id = 1  # Bạn bè
             elif "thầy cô" in lowered_filename:
-                group_id = 1
+                group_id = 2  # Thầy cô
             elif "cha mẹ" in lowered_filename:
-                group_id = 2
+                group_id = 3  # Cha mẹ
             elif "anh em" in lowered_filename:
-                group_id = 3
+                group_id = 4  # Anh em -> map vào group Bạn bè
 
             # Tách các block tình huống
             blocks = re.split(r"(Tình huống.*?\?)", content, flags=re.DOTALL)
@@ -89,10 +113,6 @@ class SituationalService:
                 )
                 answer_content = answer_match.group(1).strip() if answer_match else None
 
-                full_content = question_content
-                if answer_content:
-                    full_content += "\n" + answer_content
-
                 data.append(
                     {
                         "level": level,
@@ -105,11 +125,14 @@ class SituationalService:
         return data
 
     @staticmethod
-    def import_situational_from_files(db: Session, directory: str) -> None:
+    def import_situational_from_files(db: Session) -> None:
         """
         Đọc các file docx trong thư mục, trích xuất dữ liệu và import vào DB.
         """
-        data = SituationalService.read_situational_from_files(directory)
+        # Đảm bảo các groups đã tồn tại trước khi import
+        SituationalService.ensure_groups_exist(db)
+        
+        data = SituationalService.read_situational_from_files()
         for item in data:
             # Nếu đáp án đúng có phần 'Giải thích chuyên gia:', tách phần này ra khỏi answer_content và nối vào content của câu hỏi
             explanation = ""
@@ -151,6 +174,8 @@ class SituationalService:
                     is_correct=is_correct,
                 )
                 db.add(situ_answer)
+            db.flush()
+            print("Đã thêm câu hỏi:", situ_question.content)
         db.commit()
 
     @staticmethod
