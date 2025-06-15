@@ -64,10 +64,18 @@ class QuestionService:
             # Đọc câu hỏi từ file
             questions = QuestionService.read_questions_from_docx(file_path)
             for q in questions:
+                # Kiểm tra đã tồn tại Test này chưa (dựa vào content và group_id)
+                existing_test = db.query(Test).filter_by(content=q['content'], group_id=group.id).first()
+                if existing_test:
+                    continue
                 test = Test(content=q['content'], group_id=group.id)
                 db.add(test)
                 db.flush()
                 for opt in q['options']:
+                     # Kiểm tra đã tồn tại Option này chưa (dựa vào test_id, content, level)
+                    existing_option = db.query(Option).filter_by(test_id=test.id, content=opt['content'], level=opt['level']).first()
+                    if existing_option:
+                        continue
                     option = Option(test_id=test.id, content=opt['content'], level=opt['level'])
                     db.add(option)
             db.commit()

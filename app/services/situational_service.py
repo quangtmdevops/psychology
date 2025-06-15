@@ -146,6 +146,14 @@ class SituationalService:
                 full_content += "\n" + answer_content_main
             if explanation:
                 full_content += "\n" + explanation
+            # Kiểm tra đã tồn tại câu hỏi này chưa (dựa vào content, level, situation_group_id)
+            existing_question = db.query(SituationalQuestion).filter_by(
+                content=full_content,
+                level=item["level"],
+                situation_group_id=item["situation_group_id"]
+            ).first()
+            if existing_question:
+                continue
             situ_question = SituationalQuestion(
                 content=full_content,
                 level=item["level"],
