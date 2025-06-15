@@ -56,42 +56,42 @@ async def read_users(
     return {"users": [build_user_response(u) for u in users]}
 
 
-@router.get(
-    "/{user_id}",
-    responses={
-        200: {"description": "User information"},
-        401: {"description": "Not authenticated"},
-        403: {"description": "Not enough permissions"},
-        404: {"description": "User not found"}
-    }
-)
-async def read_user(
-        user_id: int,
-        current_user: User = Security(get_current_user, scopes=["users:read"]),
-        db: Session = Depends(get_db)
-):
-    """
-    Get user by ID.
+# @router.get(
+#     "/{user_id}",
+#     responses={
+#         200: {"description": "User information"},
+#         401: {"description": "Not authenticated"},
+#         403: {"description": "Not enough permissions"},
+#         404: {"description": "User not found"}
+#     }
+# )
+# async def read_user(
+#         user_id: int,
+#         current_user: User = Security(get_current_user, scopes=["users:read"]),
+#         db: Session = Depends(get_db)
+# ):
+#     """
+#     Get user by ID.
     
-    Requires authentication token with 'users:read' scope.
+#     Requires authentication token with 'users:read' scope.
     
-    - **user_id**: ID of the user to retrieve
-    """
-    db_user = db.query(User).filter(User.id == user_id).first()
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {"user": build_user_response(db_user)}
+#     - **user_id**: ID of the user to retrieve
+#     """
+#     db_user = db.query(User).filter(User.id == user_id).first()
+#     if db_user is None:
+#         raise HTTPException(status_code=404, detail="User not found")
+#     return {"user": build_user_response(db_user)}
 
 
-class UserUpdateIn(BaseModel):
-    displayName: str = None
-    dob: str = None
-    image: str = None
-    isPremium: bool = None
+# class UserUpdateIn(BaseModel):
+#     displayName: str = None
+#     dob: str = None
+#     image: str = None
+#     isPremium: bool = None
 
 @router.put("/", response_model=dict)
 def update_user(
-    user_update: UserUpdateIn,
+    user_update: UserUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
