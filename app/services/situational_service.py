@@ -9,7 +9,7 @@ from app.models.models import (
     SituationalAnswer,
     User,
     SituationalUserAnswer,
-    Group,
+    SituationGroup,
 )
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
@@ -18,25 +18,6 @@ from docx import Document
 
 class SituationalService:
     # ... các hàm khác ...
-
-    @staticmethod
-    def ensure_groups_exist(db: Session) -> None:
-        """
-        Đảm bảo các groups cần thiết đã tồn tại trong database
-        """
-        groups = [
-            Group(id=1, name="Bạn bè", description="Các tình huống liên quan đến bạn bè"),
-            Group(id=2, name="Thầy cô", description="Các tình huống liên quan đến thầy cô"),
-            Group(id=3, name="Cha mẹ", description="Các tình huống liên quan đến cha mẹ"),
-            Group(id=4, name="Anh em", description="Các tình huống liên quan đến anh em"),
-        ]
-
-        for group in groups:
-            existing_group = db.query(Group).filter(Group.id == group.id).first()
-            if not existing_group:
-                db.add(group)
-        
-        db.commit()
 
     @staticmethod
     def read_situational_from_files() -> List[Dict[str, Any]]:
@@ -57,17 +38,17 @@ class SituationalService:
             match = re.search(r"(\d+)", filename)
             level = int(match.group(1)) if match else None
 
-            # Xác định group_id dựa trên tên của file
-            group_id = None
+            # Xác định situation_group_id dựa trên tên của file
+            situation_group_id = None
             lowered_filename = filename.lower()
             if "bạn bè" in lowered_filename:
-                group_id = 1  # Bạn bè
+                situation_group_id = 1  # Bạn bè
             elif "thầy cô" in lowered_filename:
-                group_id = 2  # Thầy cô
+                situation_group_id = 2  # Thầy cô
             elif "cha mẹ" in lowered_filename:
-                group_id = 3  # Cha mẹ
+                situation_group_id = 3  # Cha mẹ
             elif "anh em" in lowered_filename:
-                group_id = 4  # Anh em -> map vào group Bạn bè
+                situation_group_id = 4  # Anh em
 
             # Tách các block tình huống
             blocks = re.split(r"(Tình huống.*?\?)", content, flags=re.DOTALL)
@@ -116,7 +97,7 @@ class SituationalService:
                 data.append(
                     {
                         "level": level,
-                        "group_id": group_id,
+                        "situation_group_id": situation_group_id,
                         "question_content": question_content,
                         "options": options,
                         "answer_content": answer_content,
@@ -129,9 +110,25 @@ class SituationalService:
         """
         Đọc các file docx trong thư mục, trích xuất dữ liệu và import vào DB.
         """
-        # Đảm bảo các groups đã tồn tại trước khi import
-        SituationalService.ensure_groups_exist(db)
+        # Tạo các nhóm tình huống nếu chưa tồn tại
+        situation_groups = {
+            1: {"name": "Bạn bè", "description": "Các tình huống liên quan đến bạn bè"},
+            2: {"name": "Thầy cô", "description": "Các tình huống liên quan đến thầy cô"},
+            3: {"name": "Cha mẹ", "description": "Các tình huống liên quan đến cha mẹ"},
+            4: {"name": "Anh em", "description": "Các tình huống liên quan đến anh em"},
+        }
         
+        for group_id, group_data in situation_groups.items():
+            group = db.query(SituationGroup).filter(SituationGroup.id == group_id).first()
+            if not group:
+                group = SituationGroup(
+                    id=group_id,
+                    name=group_data["name"],
+                    description=group_data["description"]
+                )
+                db.add(group)
+        db.commit()
+
         data = SituationalService.read_situational_from_files()
         for item in data:
             # Nếu đáp án đúng có phần 'Giải thích chuyên gia:', tách phần này ra khỏi answer_content và nối vào content của câu hỏi
@@ -152,7 +149,7 @@ class SituationalService:
             situ_question = SituationalQuestion(
                 content=full_content,
                 level=item["level"],
-                group_id=item["group_id"],
+                situation_group_id=item["situation_group_id"],
             )
             db.add(situ_question)
             db.flush()  # để lấy id
@@ -183,7 +180,7 @@ class SituationalService:
         user_id = current_user.id
         questions = (
             db.query(SituationalQuestion)
-            .filter(SituationalQuestion.group_id == group)
+            .filter(SituationalQuestion.situation_group_id == group)
             .all()
         )
         # Đếm tổng số câu hỏi theo level
@@ -223,7 +220,7 @@ class SituationalService:
         questions = (
             db.query(SituationalQuestion)
             .filter(
-                SituationalQuestion.group_id == group,
+                SituationalQuestion.situation_group_id == group,
                 SituationalQuestion.level == level,
             )
             .all()

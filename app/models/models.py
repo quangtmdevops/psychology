@@ -44,6 +44,7 @@ class User(Base):
     # Relationships
     posts = relationship("Post", back_populates="author")
     entities = relationship("Entity", back_populates="user")
+    situational_progress = relationship("UserSituationalProgress", back_populates="user")
 
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', username='{self.username}', display_name='{self.display_name}', dob='{self.dob}', attendances='{self.attendances}', image='{self.image}', stars={self.stars}, is_premium={self.is_premium}, free_chat={self.free_chat})>"
@@ -60,7 +61,7 @@ class Group(Base):
     description = Column(Text)
 
     sub_groups = relationship("SubGroup", back_populates="group")
-    situational_questions = relationship("SituationalQuestion", back_populates="group")
+    tests = relationship("Test", back_populates="group")
 
     def __repr__(self):
         return f"<Group(id={self.id}, name='{self.name}')>"
@@ -88,25 +89,40 @@ class SubGroup(Base):
         return f"SubGroup: {self.name}"
 
 
+class SituationGroup(Base):
+    __tablename__ = "situation_group"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text)
+
+    situational_questions = relationship("SituationalQuestion", back_populates="situation_group")
+
+    def __repr__(self):
+        return f"<SituationGroup(id={self.id}, name='{self.name}')>"
+
+    def __str__(self):
+        return f"Situation Group: {self.name}"
+
+
 class SituationalQuestion(Base):
     __tablename__ = "situational_question"
 
     id = Column(Integer, primary_key=True)
-    group_id = Column(
-        Integer, ForeignKey("group.id", ondelete="CASCADE"), nullable=False
-    )
     content = Column(Text, nullable=False)
-    level = Column(Integer)
+    order = Column(Integer)
+    situation_group_id = Column(Integer, ForeignKey("situation_group.id"), nullable=False)
+    level = Column(Integer, nullable=False)
 
-    group = relationship("Group", back_populates="situational_questions")
-
-    __table_args__ = (CheckConstraint("level IN (1, 2, 3)", name="check_level_values"),)
+    situation_group = relationship("SituationGroup", back_populates="situational_questions")
+    answers = relationship("SituationalAnswer", back_populates="question")
+    user_progress = relationship("UserSituationalProgress", back_populates="question")
 
     def __repr__(self):
-        return f"<SituationalQuestion(id={self.id}, level={self.level})>"
+        return f"<SituationalQuestion(id={self.id}, order={self.order}, level={self.level})>"
 
     def __str__(self):
-        return f"Question Level {self.level}"
+        return f"Situational Question #{self.order} (Level {self.level})"
 
 
 class SituationalAnswer(Base):
@@ -121,13 +137,33 @@ class SituationalAnswer(Base):
     content = Column(Text, nullable=False)
     is_correct = Column(Boolean, default=False)
 
-    question = relationship("SituationalQuestion", backref="answers")
+    question = relationship("SituationalQuestion", back_populates="answers")
 
     def __repr__(self):
         return f"<SituationalAnswer(id={self.id}, question_id={self.question_id}, is_correct={self.is_correct})>"
 
     def __str__(self):
         return f"Answer: {self.content[:30]}..."
+
+
+class UserSituationalProgress(Base):
+    __tablename__ = "user_situational_progress"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    question_id = Column(Integer, ForeignKey("situational_question.id", ondelete="CASCADE"), nullable=False)
+    is_completed = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", back_populates="situational_progress")
+    question = relationship("SituationalQuestion", back_populates="user_progress")
+
+    def __repr__(self):
+        return f"<UserSituationalProgress(id={self.id}, user_id={self.user_id}, question_id={self.question_id}, is_completed={self.is_completed})>"
+
+    def __str__(self):
+        return f"Progress: User {self.user_id} - Question {self.question_id}"
 
 
 class Post(Base):
@@ -161,7 +197,7 @@ class Test(Base):
     order = Column(Integer)
     group_id = Column(Integer, ForeignKey("group.id"), nullable=False)
 
-    group = relationship("Group", backref="tests")
+    group = relationship("Group", back_populates="tests")
     options = relationship("Option", back_populates="test")
     answers = relationship("TestAnswer", back_populates="test")
     entities = relationship("Entity", back_populates="test")

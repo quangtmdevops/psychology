@@ -1,25 +1,34 @@
 from pydantic import BaseModel, conint
-from typing import Optional
+from typing import Optional, List
+
+from app.models.models import SituationGroup, SituationalAnswer
 
 
 class SituationalQuestionBase(BaseModel):
     content: str
-    level: conint(ge=1, le=3)
-    group_id: int
+    order: int
+    situation_group_id: int
+    level: int
+
+    class Config:
+        from_attributes = True
 
 
 class SituationalQuestionCreate(SituationalQuestionBase):
     pass
 
 
-class SituationalQuestionUpdate(SituationalQuestionBase):
+class SituationalQuestionUpdate(BaseModel):
     content: Optional[str] = None
-    level: Optional[conint(ge=1, le=3)] = None
-    group_id: Optional[int] = None
+    order: Optional[int] = None
+    situation_group_id: Optional[int] = None
+    level: Optional[int] = None
 
 
-class SituationalQuestionInDB(SituationalQuestionBase):
+class SituationalQuestion(SituationalQuestionBase):
     id: int
+    situation_group: SituationGroup
+    answers: List[SituationalAnswer]
 
     class Config:
         from_attributes = True

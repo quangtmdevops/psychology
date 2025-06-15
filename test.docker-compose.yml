@@ -11,12 +11,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    networks:
-      - psychology_net
+#    networks:
+#      - psychology_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 20s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 5
       start_period: 10s
 
@@ -31,14 +31,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
-    networks:
-      - psychology_net
+#    networks:
+#      - psychology_net
 
 volumes:
   postgres_data:
 
-networks:
-  psychology_net:
-    driver: bridge
+#networks:
+#  psychology_net:
+#    driver: bridge
