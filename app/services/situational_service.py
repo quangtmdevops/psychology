@@ -224,7 +224,7 @@ class SituationalService:
         return result
 
     @staticmethod
-    def get_situational_questions(group: int, level: int, db: Session):
+    def get_situational_questions(group: int, level: int, db: Session, current_user: User):
         questions = (
             db.query(SituationalQuestion)
             .filter(

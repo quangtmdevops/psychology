@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, status
+from fastapi import APIRouter, Depends, Query, HTTPException, status, Security
 from sqlalchemy.orm import Session
 from typing import List, Literal
 from pydantic import BaseModel
@@ -32,6 +32,7 @@ class GroupedTestOut(BaseModel):
 def get_tests(
     type: Literal["RADS", "DASS", "MDQ"] = Query(..., description="Test type"),
     db: Session = Depends(get_db),
+    current_user: User = Security(get_current_user, scopes=["users:read"]),
 ):
     group = db.query(Group).filter(Group.name == type).first()
     if not group:
@@ -63,7 +64,7 @@ class TestAnswerIn(BaseModel):
 def submit_test_answers(
     answers: List[TestAnswerIn],
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Security(get_current_user, scopes=["users:read"]),
 ):
     saved_answers = []
     for ans in answers:

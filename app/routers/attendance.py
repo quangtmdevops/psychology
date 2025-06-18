@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Security
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.models import User
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/attendance", tags=["attendance"])
 @router.post("/", status_code=status.HTTP_200_OK)
 def mark_attendance(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Security(get_current_user, scopes=["users:read"])
 ):
     user = db.query(User).filter(User.id == current_user.id).first()
     if not user:

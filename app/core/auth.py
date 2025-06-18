@@ -16,7 +16,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/api/v1/users/token",
+    tokenUrl="/api/v1/auth/login",
     scopes={
         "users:read": "Read user information",
         "users:write": "Modify user information",
@@ -102,7 +102,7 @@ def create_user_token(user: User, scopes: list[str] = None) -> dict:
         dict: Token information including access_token and token_type
     """
     if scopes is None:
-        scopes = ["users:read"]
+        scopes = ["users:read", "users:write"]  # Give read and write permissions to all users
         
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(

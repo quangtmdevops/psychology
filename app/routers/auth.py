@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Security
 from sqlalchemy.orm import Session
 from app.schemas.user import UserLogin, UserCreate, Token
 from app.models.models import User
 from app.core.database import get_db
-from app.core.auth import verify_password, get_password_hash, create_user_token
+from app.core.auth import verify_password, get_password_hash, create_user_token, get_current_user
 from typing import Any
 from sqlalchemy.exc import IntegrityError
 from app.services.auth_service import AuthService
@@ -47,5 +47,14 @@ class PasswordChange(BaseModel):
 
 
 @router.post("/password")
-def change_password(data: PasswordChange, db: Session = Depends(get_db)):
+def change_password(
+    data: PasswordChange, 
+    current_user: User = Security(get_current_user, scopes=["users:read"]),
+    db: Session = Depends(get_db)
+):
+    """
+    Change user password.
+    
+    Requires authentication token with 'users:read' scope.
+    """
     return AuthService.change_password(data.email, data.oldPassword, data.newPassword, db)

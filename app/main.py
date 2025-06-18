@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.security import OAuth2PasswordBearer
 from app.core.database import engine, Base
-from app.routers import users, groups, posts, test, auth
+from app.routers import users, posts, test, auth
 from app.core.auth import get_current_user
 from app.models.models import User
 from app.schemas.user import (
@@ -30,8 +30,8 @@ app = FastAPI(
     
     This API uses JWT Bearer token authentication. To use the API:
     
-    1. Register a new user at `/api/v1/users/register`
-    2. Get a token at `/api/v1/users/token`
+    1. Register a new user at `/api/v1/auth/signup`
+    2. Get a token at `/api/v1/auth/login`
     3. Use the token in the Authorization header: `Bearer your_token_here`
     
     ## Scopes
@@ -58,13 +58,16 @@ app.add_middleware(
 )
 
 # Include routers with authentication
-app.include_router(users, prefix="/api/v1")
-app.include_router(groups, prefix="/api/v1", dependencies=[Depends(get_current_user)])
+app.include_router(users, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(posts, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(test, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(auth.router, prefix="/api/v1")
-app.include_router(attendance_router, prefix="/api/v1")
-app.include_router(situational_router, prefix="/api/v1")
+app.include_router(
+    attendance_router, prefix="/api/v1", dependencies=[Depends(get_current_user)]
+)
+app.include_router(
+    situational_router, prefix="/api/v1"
+)
 
 
 # Custom OpenAPI schema with security scheme
@@ -139,7 +142,7 @@ async def custom_swagger_ui_html():
     )
 
 
-@app.get("/")
+@app.get("/", tags=["root"])
 async def root():
     return {"message": "Welcome to Psychology API"}
 

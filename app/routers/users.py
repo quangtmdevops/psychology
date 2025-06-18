@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Security
+from fastapi import APIRouter, Depends, HTTPException, status, Security, Form
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
@@ -39,15 +39,20 @@ def build_user_response(user):
     "/",
     responses={
         200: {"description": "List of users"},
+        401: {"description": "Not authenticated"},
+        403: {"description": "Not enough permissions"},
     }
 )
 async def read_users(
         skip: int = 0,
         limit: int = 100,
+        current_user: User = Security(get_current_user, scopes=["users:read"]),
         db: Session = Depends(get_db)
 ):
     """
     Get list of users.
+    
+    Requires authentication token with 'users:read' scope.
     
     - **skip**: Number of records to skip
     - **limit**: Maximum number of records to return
@@ -56,45 +61,21 @@ async def read_users(
     return {"users": [build_user_response(u) for u in users]}
 
 
-# @router.get(
-#     "/{user_id}",
-#     responses={
-#         200: {"description": "User information"},
-#         401: {"description": "Not authenticated"},
-#         403: {"description": "Not enough permissions"},
-#         404: {"description": "User not found"}
-#     }
-# )
-# async def read_user(
-#         user_id: int,
-#         current_user: User = Security(get_current_user, scopes=["users:read"]),
-#         db: Session = Depends(get_db)
-# ):
-#     """
-#     Get user by ID.
-    
-#     Requires authentication token with 'users:read' scope.
-    
-#     - **user_id**: ID of the user to retrieve
-#     """
-#     db_user = db.query(User).filter(User.id == user_id).first()
-#     if db_user is None:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     return {"user": build_user_response(db_user)}
 
-
-# class UserUpdateIn(BaseModel):
-#     displayName: str = None
-#     dob: str = None
-#     image: str = None
-#     isPremium: bool = None
 
 @router.put("/", response_model=dict)
 def update_user(
     user_update: UserUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Security(get_current_user, scopes=["users:read"])
 ):
+    """
+    Update current user's information.
+    
+    Requires authentication token with 'users:readread' scope.
+    
+    - **user_update**: User information to update
+    """
     user = db.query(User).filter(User.id == current_user.id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -133,16 +114,12 @@ async def delete_user(
     """
     Delete current user's information.
     
-    - **user**: Updated user information
+    Requires authentication token with 'users:read' scope.
     """
     
     db_user = db.query(User).filter(User.id == current_user.id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    
-
-    if current_user.id != db_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to delete this user")
 
     db.delete(db_user)
     db.commit()
