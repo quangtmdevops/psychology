@@ -8,7 +8,7 @@ import json
 
 router = APIRouter(prefix="/attendance", tags=["attendance"])
 
-@router.post("/", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK)
 def mark_attendance(
     db: Session = Depends(get_db),
     current_user: User = Security(get_current_user, scopes=["users:read"])

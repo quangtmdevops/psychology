@@ -59,12 +59,13 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
     description = Column(Text)
+    code = Column(String(255), nullable=True)
 
     sub_groups = relationship("SubGroup", back_populates="group")
     tests = relationship("Test", back_populates="group")
 
     def __repr__(self):
-        return f"<Group(id={self.id}, name='{self.name}')>"
+        return f"<Group(id={self.id}, name='{self.name}', code='{self.code}')>"
 
     def __str__(self):
         return f"Group: {self.name}"
@@ -196,6 +197,7 @@ class Test(Base):
     content = Column(Text, nullable=False)
     order = Column(Integer)
     group_id = Column(Integer, ForeignKey("group.id"), nullable=False)
+    code = Column(String(255), nullable=True)
 
     group = relationship("Group", back_populates="tests")
     options = relationship("Option", back_populates="test")
@@ -203,7 +205,7 @@ class Test(Base):
     entities = relationship("Entity", back_populates="test")
 
     def __repr__(self):
-        return f"<Test(id={self.id}, order={self.order})>"
+        return f"<Test(id={self.id}, order={self.order}, code={self.code})>"
 
     def __str__(self):
         return f"Test #{self.order}"

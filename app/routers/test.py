@@ -41,18 +41,31 @@ def get_tests(
     if not tests:
         return []
 
-    test_list = []
-    for test in tests:
-        options = db.query(Option).filter(Option.test_id == test.id).all()
-        option_list = [
-            OptionOut(id=str(option.id), content=option.content, level=option.level)
-            for option in options
-        ]
-        test_list.append(
-            TestOut(id=str(test.id), content=test.content, options=option_list)
-        )
-
-    return [GroupedTestOut(group=type, test=test_list)]
+    if type == "DASS":
+        # Nhóm theo code (A, S, D)
+        code_map = {}
+        for test in tests:
+            code = test.code or "Khác"
+            options = db.query(Option).filter(Option.test_id == test.id).all()
+            option_list = [
+                OptionOut(id=str(option.id), content=option.content, level=option.level)
+                for option in options
+            ]
+            test_out = TestOut(id=str(test.id), content=test.content, options=option_list)
+            code_map.setdefault(code, []).append(test_out)
+        return [GroupedTestOut(group=code, test=test_list) for code, test_list in code_map.items()]
+    else:
+        test_list = []
+        for test in tests:
+            options = db.query(Option).filter(Option.test_id == test.id).all()
+            option_list = [
+                OptionOut(id=str(option.id), content=option.content, level=option.level)
+                for option in options
+            ]
+            test_list.append(
+                TestOut(id=str(test.id), content=test.content, options=option_list)
+            )
+        return [GroupedTestOut(group=type, test=test_list)]
 
 
 class TestAnswerIn(BaseModel):

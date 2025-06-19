@@ -2,8 +2,10 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.models.models import User
 from app.schemas.user import UserLogin, UserCreate
-from app.core.auth import verify_password, get_password_hash, create_user_token
+from app.core.auth import verify_password, get_password_hash, create_user_token, create_access_token, SECRET_KEY, ALGORITHM
 from typing import Any, Dict
+from jose import jwt
+from datetime import datetime, timedelta
 import json
 
 class AuthService:
@@ -22,6 +24,16 @@ class AuthService:
         }
 
     @staticmethod
+    def create_refresh_token(user: User) -> str:
+        expire = datetime.utcnow() + timedelta(days=7)  # Refresh token sống 7 ngày
+        to_encode = {
+            "sub": user.email,
+            "type": "refresh",
+            "exp": expire
+        }
+        return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    @staticmethod
     def login(user_login: UserLogin, db: Session) -> Dict[str, Any]:
         user = db.query(User).filter(User.email == user_login.email).first()
 
@@ -32,8 +44,10 @@ class AuthService:
             )
 
         token = create_user_token(user)
+        refresh_token = AuthService.create_refresh_token(user)
         return {
             "accessToken": token["access_token"],
+            "refreshToken": refresh_token,
             "user": AuthService.build_user_response(user)
         }
 
@@ -60,8 +74,10 @@ class AuthService:
             )
 
         token = create_user_token(user)
+        refresh_token = AuthService.create_refresh_token(user)
         return {
             "accessToken": token["access_token"],
+            "refreshToken": refresh_token,
             "user": AuthService.build_user_response(user)
         }
 
@@ -77,3 +93,21 @@ class AuthService:
         user.password = get_password_hash(new_password)
         db.commit()
         return {"msg": "Password updated successfully"} 
+    
+    @staticmethod
+    def refresh_access_token(refresh_token: str, db: Session) -> dict:
+        try:
+            payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+            email = payload.get("sub")
+            if not email:
+                raise HTTPException(status_code=401, detail="Invalid refresh token")
+            user = db.query(User).filter(User.email == email).first()
+            if not user:
+                raise HTTPException(status_code=401, detail="User not found")
+            access_token = create_user_token(user)["access_token"]
+            return {
+                "accessToken": access_token,
+                "refreshToken": refresh_token
+            }
+        except Exception:
+            raise HTTPException(status_code=401, detail="Invalid refresh token")

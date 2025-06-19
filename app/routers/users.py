@@ -38,27 +38,19 @@ def build_user_response(user):
 @router.get(
     "/",
     responses={
-        200: {"description": "List of users"},
+        200: {"description": "Current user information"},
         401: {"description": "Not authenticated"},
         403: {"description": "Not enough permissions"},
     }
 )
-async def read_users(
-        skip: int = 0,
-        limit: int = 100,
+async def read_current_user(
         current_user: User = Security(get_current_user, scopes=["users:read"]),
-        db: Session = Depends(get_db)
 ):
     """
-    Get list of users.
-    
+    Get current user's information.
     Requires authentication token with 'users:read' scope.
-    
-    - **skip**: Number of records to skip
-    - **limit**: Maximum number of records to return
     """
-    users = db.query(User).offset(skip).limit(limit).all()
-    return {"users": [build_user_response(u) for u in users]}
+    return {"user": build_user_response(current_user)}
 
 
 

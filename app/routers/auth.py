@@ -58,3 +58,21 @@ def change_password(
     Requires authentication token with 'users:read' scope.
     """
     return AuthService.change_password(data.email, data.oldPassword, data.newPassword, db)
+
+
+class RefreshTokenRequest(BaseModel):
+    refreshToken: str
+
+class RefreshTokenResponse(BaseModel):
+    accessToken: str
+    refreshToken: str
+
+@router.post("/refresh-token", response_model=RefreshTokenResponse)
+def refresh_token(
+    data: RefreshTokenRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Refresh access token using a valid refresh token.
+    """
+    return AuthService.refresh_access_token(data.refreshToken, db)
