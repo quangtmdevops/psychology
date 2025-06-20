@@ -24,7 +24,7 @@ router = APIRouter(
 
 def build_user_response(user):
     return {
-        "id": str(user.id),
+        "id": user.id,
         "username": user.username or user.email,
         "displayName": user.display_name or (user.email.split("@")[0] if user.email else None),
         "dob": user.dob,

@@ -248,12 +248,12 @@ class SituationalService:
                 .all()
             )
             answer_list = [
-                {"id": str(a.id), "content": a.content, "isCorrect": bool(a.is_correct)}
+                {"id": a.id, "content": a.content, "isCorrect": bool(a.is_correct)}
                 for a in answers
             ]
             result.append(
                 {
-                    "id": str(q.id),
+                    "id": q.id,
                     "content": q_content,
                     "explanation": explanation,
                     "answers": answer_list,

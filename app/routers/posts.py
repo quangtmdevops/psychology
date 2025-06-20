@@ -24,7 +24,7 @@ def get_posts(
     )
     post_list = [
         {
-            "id": str(p.id),
+            "id": p.id,
             "title": p.title,
             "image": p.image,
             "content": p.content,
