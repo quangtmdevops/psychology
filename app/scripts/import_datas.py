@@ -4,11 +4,11 @@ from app.services.situational_service import SituationalService
 
 def main():
     db = SessionLocal()
-    try:
-        QuestionService.import_all_questions(db)
-        print("Import questions completed successfully!")
-    except Exception as e:
-        print(f"Error importing questions: {str(e)}")
+    # try:
+    #     QuestionService.import_all_questions(db)
+    #     print("Import questions completed successfully!")
+    # except Exception as e:
+    #     print(f"Error importing questions: {str(e)}")
         
     try: 
         SituationalService.import_situational_from_files(db)

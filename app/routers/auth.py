@@ -14,22 +14,6 @@ router = APIRouter(
     tags=["auth"]
 )
 
-
-def build_user_response(user):
-    import json
-    return {
-        "id": user.id,
-        "username": user.username,
-        "displayName": user.display_name,
-        "dob": user.dob,
-        "attendances": json.loads(user.attendances) if user.attendances else [0, 0, 0, 0, 0, 0, 0],
-        "image": user.image,
-        "stars": user.stars,
-        "isPremium": user.is_premium,
-        "freeChat": user.free_chat
-    }
-
-
 @router.post("/login")
 def login(user_login: UserLogin, db: Session = Depends(get_db)) -> Any:
     return AuthService.login(user_login, db)

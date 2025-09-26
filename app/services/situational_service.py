@@ -23,6 +23,8 @@ class SituationalService:
     def read_situational_from_files() -> List[Dict[str, Any]]:
         """
         Đọc các file docx trong thư mục mặc định, trích xuất dữ liệu và trả về list dict.
+        - Mặc định Level = 1 cho tới khi gặp dòng "Level X" thì chuyển level hiện hành.
+        - Mỗi câu hỏi bắt đầu bằng "Tình huống" và kết thúc trước tiêu đề "Tình huống" tiếp theo hoặc "Level".
         """
         data = []
         # Đường dẫn mặc định tới thư mục chứa file situational
@@ -32,11 +34,7 @@ class SituationalService:
         for filename in os.listdir(directory):
             if not filename.endswith(".docx"):
                 continue
-            # Lấy level từ tên file
             doc = Document(os.path.join(directory, filename))
-            content = "\n".join([p.text for p in doc.paragraphs])
-            match = re.search(r"(\d+)", filename)
-            level = int(match.group(1)) if match else None
 
             # Xác định situation_group_id dựa trên tên của file
             situation_group_id = None
@@ -50,59 +48,106 @@ class SituationalService:
             elif "anh em" in lowered_filename:
                 situation_group_id = 4  # Anh em
 
-            # Tách các block tình huống
-            blocks = re.split(r"(Tình huống.*?\?)", content, flags=re.DOTALL)
-            for i in range(1, len(blocks), 2):
-                question_block = blocks[i] + (
-                    blocks[i + 1] if i + 1 < len(blocks) else ""
-                )
-                # Lấy content câu hỏi
-                question_match = re.search(
-                    r"(Tình huống.*?\?)", question_block, flags=re.DOTALL
-                )
-                question_content = (
-                    question_match.group(1).strip() if question_match else None
-                )
+            # Duyệt theo từng đoạn văn để cập nhật level và gom block câu hỏi
+            current_level = 1
+            i = 0
+            paragraphs = [p.text.strip() for p in doc.paragraphs]
+            total = len(paragraphs)
+            while i < total:
+                line = paragraphs[i]
+                if not line:
+                    i += 1
+                    continue
+                # Cập nhật level khi gặp dòng Level X
+                # level_m = re.match(r"^Level\s*(\d+)", line, flags=re.IGNORECASE)
+                level_m = re.match(r"^\s*Level\s*(\d+)", line, flags=re.IGNORECASE)
+                if level_m:
+                    try:
+                        current_level = int(level_m.group(1))
+                    except Exception:
+                        current_level = 1
+                    i += 1
+                    continue
 
-                # Lấy các lựa chọn
-                options_match = re.search(
-                    r"(A\..*?D\..*?)(?=\n|$)", question_block, flags=re.DOTALL
-                )
-                options_content = (
-                    options_match.group(1).strip() if options_match else None
-                )
-                options = []
-                options_content = options_content.strip() if options_content else ""
-                if options_content:
-                    current_option = ""
-                    for line in options_content.splitlines():
-                        line = line.strip()
-                        if not line:
-                            continue
-                        if re.match(r"^[A-D]\.", line):
-                            if current_option:
-                                options.append(current_option.strip())
-                            current_option = line
-                        else:
-                            current_option += " " + line
-                    if current_option:
-                        options.append(current_option.strip())
+                # Bắt đầu một câu hỏi
+                if re.match(r"^Tình huống", line, flags=re.IGNORECASE):
+                    buffer_lines = [line]
+                    j = i + 1
+                    while j < total:
+                        next_line = paragraphs[j]
+                        # Ngắt khi gặp tiêu đề Level hoặc tiêu đề câu hỏi tiếp theo
+                        if re.match(r"^Level\s*\d+", next_line, flags=re.IGNORECASE) or \
+                           re.match(r"^Tình huống", next_line, flags=re.IGNORECASE):
+                            break
+                        buffer_lines.append(next_line)
+                        j += 1
 
-                # Lấy đáp án
-                answer_match = re.search(
-                    r"(Đáp án đúng.*?)(?=Tình huống|$)", question_block, flags=re.DOTALL
-                )
-                answer_content = answer_match.group(1).strip() if answer_match else None
+                    question_block = "\n".join([l for l in buffer_lines if l is not None])
 
-                data.append(
-                    {
-                        "level": level,
-                        "situation_group_id": situation_group_id,
-                        "question_content": question_content,
-                        "options": options,
-                        "answer_content": answer_content,
-                    }
-                )
+                    # Phân tách block theo dòng để xác định phần câu hỏi, lựa chọn và đáp án
+                    lines = [ln.strip() for ln in question_block.splitlines()]
+                    # Tìm vị trí bắt đầu options và đáp án
+                    opt_idx = None
+                    ans_idx = None
+                    for idx, ln in enumerate(lines):
+                        if opt_idx is None and re.match(r"^[A-E][\.)]?\s", ln):
+                            opt_idx = idx
+                        if ans_idx is None and (ln.startswith("Đáp án") or ln.startswith("Đáp án đúng")):
+                            ans_idx = idx
+                        if opt_idx is not None and ans_idx is not None:
+                            break
+
+                    # Xác định ranh giới các phần
+                    cut_idx_candidates = []
+                    if opt_idx is not None:
+                        cut_idx_candidates.append(opt_idx)
+                    if ans_idx is not None:
+                        cut_idx_candidates.append(ans_idx)
+                    end_question_idx = min(cut_idx_candidates) if cut_idx_candidates else len(lines)
+
+                    # Gom phần câu hỏi từ đầu block tới trước options/đáp án
+                    question_part = lines[:end_question_idx]
+                    # Loại bỏ dòng trống đầu/cuối
+                    while question_part and not question_part[0]:
+                        question_part.pop(0)
+                    while question_part and not question_part[-1]:
+                        question_part.pop()
+                    question_content = "\n".join(question_part) if question_part else None
+
+                    # Lấy các lựa chọn: từ opt_idx tới trước ans_idx
+                    options: List[str] = []
+                    if opt_idx is not None:
+                        end_opt_idx = ans_idx if ans_idx is not None else len(lines)
+                        option_lines = lines[opt_idx:end_opt_idx]
+                        current_option = ""
+                        for opt_line in option_lines:
+                            if re.match(r"^[A-E][\.)]?\s", opt_line):
+                                if current_option:
+                                    options.append(current_option.strip())
+                                current_option = opt_line
+                            else:
+                                current_option = (current_option + " " + opt_line).strip()
+                        if current_option:
+                            options.append(current_option.strip())
+
+                    # Lấy đáp án: từ ans_idx đến hết block
+                    answer_content = None
+                    if ans_idx is not None:
+                        answer_content = "\n".join(lines[ans_idx:]).strip() or None
+
+                    data.append(
+                        {
+                            "level": current_level,
+                            "situation_group_id": situation_group_id,
+                            "question_content": question_content,
+                            "options": options,
+                            "answer_content": answer_content,
+                        }
+                    )
+                    i = j
+                    continue
+
+                i += 1
         return data
 
     @staticmethod
@@ -141,6 +186,11 @@ class SituationalService:
             else:
                 answer_content_main = answer_content
             # Nối answer_content_main vào content câu hỏi nếu có
+            # Bỏ qua nếu không có content câu hỏi hợp lệ hoặc thiếu group
+            if not item.get("question_content"):
+                continue
+            if not item.get("situation_group_id"):
+                continue
             full_content = item["question_content"]
             if answer_content_main:
                 full_content += "\n" + answer_content_main

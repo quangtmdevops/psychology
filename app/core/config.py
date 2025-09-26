@@ -1,6 +1,6 @@
 import os
 from pydantic_settings import BaseSettings
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 class Settings(BaseSettings):
     # Add your config variables here
     SECRET_KEY: str = "your-secret-key"
@@ -25,7 +25,8 @@ class Settings(BaseSettings):
             return f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         else:
             # Default to SQLite if any required configuration is missing
-            return f"sqlite:///{self.DB_NAME}.db"
+            # return f"sqlite:///{self.DB_NAME}.db"
+            return f"sqlite:///{os.path.join(BASE_DIR, self.DB_NAME)}.db"
 
     class Config:
         env_file = ".env"
