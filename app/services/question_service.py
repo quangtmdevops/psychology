@@ -62,10 +62,10 @@ class QuestionService:
                                 ]
                         else:
                             options = [
-                                {'level': 0, 'content': 'Không đúng với tôi chút nào cả'},
-                                {'level': 1, 'content': 'Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng'},
-                                {'level': 2, 'content': 'Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng'},
-                                {'level': 3, 'content': 'Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng'}
+                                {'level': 1, 'content': 'Không đúng với tôi chút nào cả'},
+                                {'level': 2, 'content': 'Đúng với tôi phần nào, hoặc thỉnh thoảng mới đúng'},
+                                {'level': 3, 'content': 'Đúng với tôi phần nhiều, hoặc phần lớn thời gian là đúng'},
+                                {'level': 4, 'content': 'Hoàn toàn đúng với tôi, hoặc hầu hết thời gian là đúng'}
                             ]
                         questions.append({
                             'content': statement_text,
