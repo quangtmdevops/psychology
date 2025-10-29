@@ -39,7 +39,8 @@ class User(Base):
     )  # JSON string for attendance array
     image = Column(String, nullable=True)  # Profile image URL
     stars = Column(Integer, default=0)  # Total stars earned
-    free_chat = Column(Integer, default=0)  # Free chat count
+    free_chat = Column(Integer, default=3)  # Free chat count
+    last_chat_date = Column(DateTime, default=None)  # Track last chat date to reset daily limit
 
     # Relationships
     posts = relationship("Post", back_populates="author")

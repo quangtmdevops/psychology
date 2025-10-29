@@ -9,6 +9,7 @@ from app.core.auth import get_current_user
 from app.models.models import User
 from app.routers.attendance import router as attendance_router
 from app.routers.situational import router as situational_router
+from app.routers.chat import router as chat_router
 
 # Create database tables for the first time
 Base.metadata.create_all(bind=engine)
@@ -60,6 +61,9 @@ app.include_router(
 )
 app.include_router(
     situational_router, prefix="/api/v1"
+)
+app.include_router(
+    chat_router, prefix="/api/v1"
 )
 
 

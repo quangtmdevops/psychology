@@ -17,7 +17,7 @@ class UserService:
             "image": user.image,
             "stars": user.stars if hasattr(user, "stars") else 0,
             "isPremium": user.is_premium,
-            "freeChat": user.free_chat if hasattr(user, "free_chat") else 0
+            "freeChat": user.free_chat if hasattr(user, "free_chat") else 3
         }
 
     @staticmethod
