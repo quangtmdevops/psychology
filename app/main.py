@@ -55,7 +55,6 @@ app.include_router(auth.router, prefix="/api/v1")
 app.include_router(users, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(posts, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(test, prefix="/api/v1", dependencies=[Depends(get_current_user)])
-app.include_router(auth.router, prefix="/api/v1")
 app.include_router(
     attendance_router, prefix="/api/v1", dependencies=[Depends(get_current_user)]
 )
