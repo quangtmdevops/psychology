@@ -27,7 +27,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8015:8000"
     container_name: api_container
     depends_on:
       db:
