@@ -21,5 +21,6 @@ RUN chmod +x /app/startup.sh
 
 EXPOSE 8000
 
+RUN ls -la
 # Use the startup script
-CMD ["/app/startup.sh"]
+CMD ["./startup.sh"]

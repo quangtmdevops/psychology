@@ -22,20 +22,60 @@ services:
 
   web:
     image: psychology-api
-    restart: always
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: psychology-api
+    restart: always
     ports:
       - "8015:8000"
-    container_name: api_container
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - .env
+      minio:
+        condition: service_healthy
     networks:
       - psychology_net
+
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: psychology-minio
+    environment:
+      MINIO_ROOT_USER: "${R2_ACCESS_KEY}"
+      MINIO_ROOT_PASSWORD: "${R2_SECRET_KEY}"
+    command: server /data --console-address ":9002"
+    ports:
+      - "9890:9000"
+      - "9891:9002"
+    volumes:
+      - ./volume_data/minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - psychology_net
+    restart: unless-stopped
+
+  minio-init:
+    image: quay.io/minio/mc:latest
+    container_name: psychology-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local-minio http://minio:9000 ${R2_ACCESS_KEY} ${R2_SECRET_KEY};
+        mc mb -p local-minio/${R2_BUCKET} || true;
+        mc anonymous set public local-minio/${R2_BUCKET};
+        echo '✅ MinIO bucket \"${R2_BUCKET}\" initialized successfully';
+      "
+    networks:
+      - psychology_net
+    restart: "no"
 
 volumes:
   postgres_data:

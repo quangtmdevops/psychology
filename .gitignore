@@ -46,4 +46,7 @@ postgres_data/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+data/sound/
+volume_data/
