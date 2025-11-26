@@ -23,7 +23,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url=None,  # disable default
     redoc_url=None,  # disable default
-    openapi_url="/api/openapi.json"
+    openapi_url="/openapi.json"
 )
 
 # ---------------------------------------------------------
@@ -82,10 +82,10 @@ app.openapi = custom_openapi
 # ---------------------------------------------------------
 #          CUSTOM SWAGGER UI
 # ---------------------------------------------------------
-@app.get("/api/docs", include_in_schema=False)  # 👈 FIXED
+@app.get("/swagger", include_in_schema=False)  # 👈 FIXED
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(
-        openapi_url="/api/openapi.json",  # 👈 FIXED
+        openapi_url="/openapi.json",  # 👈 FIXED
         title=app.title + " - Swagger UI",
         swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
         swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
