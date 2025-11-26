@@ -11,62 +11,47 @@ from app.routers.attendance import router as attendance_router
 from app.routers.situational import router as situational_router
 from app.routers.chat import router as chat_router
 
-# Create database tables for the first time
+# Create database tables
 Base.metadata.create_all(bind=engine)
 
+# ---------------------------------------------------------
+#          FIX SWAGGER + OPENAPI URL
+# ---------------------------------------------------------
 app = FastAPI(
     title="Psychology API",
-    description="""
-    API for Psychology Application.
-    
-    ## Authentication
-    
-    This API uses JWT Bearer token authentication. To use the API:
-    
-    1. Register a new user at `/api/v1/auth/signup`
-    2. Get a token at `/api/v1/auth/login`
-    3. Use the token in the Authorization header: `Bearer your_token_here`
-    
-    ## Scopes
-    
-    The API uses the following scopes:
-    - `users:read`: Read user information
-    - `users:write`: Modify user information
-    - `users:delete`: Delete user account
-    
-    Regular users get `users:read` scope, while premium users get all scopes.
-    """,
+    description="API for Psychology Application.",
     version="1.0.0",
-    docs_url=None,  # Disable default docs
-    redoc_url=None,  # Disable default redoc
+    docs_url=None,  # disable default
+    redoc_url=None,  # disable default
+    openapi_url="/api/openapi.json"
 )
 
-# Configure CORS
+# ---------------------------------------------------------
+#          CORS
+# ---------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers with authentication
+# ---------------------------------------------------------
+#          ROUTERS
+# ---------------------------------------------------------
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(users, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(posts, prefix="/api/v1", dependencies=[Depends(get_current_user)])
 app.include_router(test, prefix="/api/v1", dependencies=[Depends(get_current_user)])
-app.include_router(
-    attendance_router, prefix="/api/v1", dependencies=[Depends(get_current_user)]
-)
-app.include_router(
-    situational_router, prefix="/api/v1"
-)
-app.include_router(
-    chat_router, prefix="/api/v1"
-)
+app.include_router(attendance_router, prefix="/api/v1", dependencies=[Depends(get_current_user)])
+app.include_router(situational_router, prefix="/api/v1")
+app.include_router(chat_router, prefix="/api/v1")
 
 
-# Custom OpenAPI schema with security scheme
+# ---------------------------------------------------------
+#          OPENAPI CUSTOM
+# ---------------------------------------------------------
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
@@ -78,37 +63,15 @@ def custom_openapi():
         routes=app.routes,
     )
 
-    # Add security scheme only, let FastAPI handle schemas
     openapi_schema.setdefault("components", {})
     openapi_schema["components"]["securitySchemes"] = {
         "Bearer": {
             "type": "http",
             "scheme": "bearer",
             "bearerFormat": "JWT",
-            "description": """
-            Enter your JWT token in the format: `Bearer your_token_here`
-            
-            To get a token:
-            1. Register at `/api/v1/auth/register`
-            2. Get token at `/api/v1/auth/login`
-            3. Use the token in the Authorization header
-            """,
         }
     }
-
-    # Add global security requirement
     openapi_schema["security"] = [{"Bearer": []}]
-
-    # Add example request bodies
-    openapi_schema["components"]["examples"] = {
-        "UserRegistration": {
-            "value": {"email": "user@example.com", "password": "password123"}
-        },
-        "UserLogin": {
-            "value": {"email": "user@example.com", "password": "password123"}
-        },
-    }
-
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
@@ -116,21 +79,20 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 
-@app.get("/docs", include_in_schema=False)
+# ---------------------------------------------------------
+#          CUSTOM SWAGGER UI
+# ---------------------------------------------------------
+@app.get("/api/docs", include_in_schema=False)  # 👈 FIXED
 async def custom_swagger_ui_html():
     return get_swagger_ui_html(
-        openapi_url="/openapi.json",
+        openapi_url="/api/openapi.json",  # 👈 FIXED
         title=app.title + " - Swagger UI",
-        oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
         swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
         swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
         swagger_ui_parameters={
             "defaultModelsExpandDepth": -1,
             "docExpansion": "none",
             "filter": True,
-            "showExtensions": True,
-            "showCommonExtensions": True,
-            "syntaxHighlight.theme": "monokai",
             "persistAuthorization": True,
             "displayRequestDuration": True,
             "tryItOutEnabled": True,
@@ -138,11 +100,17 @@ async def custom_swagger_ui_html():
     )
 
 
+# ---------------------------------------------------------
+#          ROOT
+# ---------------------------------------------------------
 @app.get("/", tags=["root"])
 async def root():
     return {"message": "Welcome to Psychology API"}
 
 
+# ---------------------------------------------------------
+#          PERMISSION HELPERS
+# ---------------------------------------------------------
 def admin_required(current_user: User = Depends(get_current_user)):
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Admin only")

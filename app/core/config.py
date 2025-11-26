@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     DB_PORT: str | None = None
     DATABASE_URL: str | None = None
 
+    R2_ACCESS_KEY: str | None = None
+    R2_SECRET_KEY: str | None = None
+    R2_BUCKET: str | None = None
+
     def get_database_url(self) -> str:
         if self.DATABASE_URL:
             return self.DATABASE_URL
@@ -38,9 +42,8 @@ class Settings(BaseSettings):
             # Default to SQLite
             return f"sqlite:///{BASE_DIR / (self.DB_NAME + '.db')}"
 
-    # ✅ Cấu hình để Pydantic tự load file .env
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
+model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 # ✅ Khi import module này, Settings sẽ tự đọc .env
 settings = Settings()

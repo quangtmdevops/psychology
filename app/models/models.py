@@ -13,6 +13,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
 
+
 # models for design schema of database
 
 
@@ -113,10 +114,8 @@ class SituationalQuestion(Base):
     id = Column(Integer, primary_key=True)
     content = Column(Text, nullable=False)
     order = Column(Integer)
-    situation_group_id = Column(Integer, ForeignKey("situation_group.id"), nullable=False)
     level = Column(Integer, nullable=False)
 
-    situation_group = relationship("SituationGroup", back_populates="situational_questions")
     answers = relationship("SituationalAnswer", back_populates="question")
     user_progress = relationship("UserSituationalProgress", back_populates="question")
 
