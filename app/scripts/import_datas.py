@@ -10,11 +10,11 @@ def main():
     except Exception as e:
         print(f"Error importing questions: {str(e)}")
         
-    try:
-        SituationalService.import_situational_from_files(db)
-        print("Import situational questions completed successfully!")
-    except Exception as e:
-        print(f"Error importing situational questions: {str(e)}")
+    # try:
+    #     SituationalService.import_situational_from_files(db)
+    #     print("Import situational questions completed successfully!")
+    # except Exception as e:
+    #     print(f"Error importing situational questions: {str(e)}")
     finally:
         db.close()
 

@@ -7,7 +7,6 @@ from sqlalchemy import (
     Boolean,
     ForeignKey,
     DateTime,
-    CheckConstraint,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -90,22 +89,6 @@ class SubGroup(Base):
 
     def __str__(self):
         return f"SubGroup: {self.name}"
-
-
-class SituationGroup(Base):
-    __tablename__ = "situation_group"
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
-    description = Column(Text)
-
-    situational_questions = relationship("SituationalQuestion", back_populates="situation_group")
-
-    def __repr__(self):
-        return f"<SituationGroup(id={self.id}, name='{self.name}')>"
-
-    def __str__(self):
-        return f"Situation Group: {self.name}"
 
 
 class SituationalQuestion(Base):

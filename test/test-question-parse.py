@@ -8,5 +8,5 @@ if __name__ == "__main__":
     }
     output = None
     for test_type, file_path in file_paths.items():
-        output = QuestionService.read_questions_from_docx(self=QuestionService(),file_path=file_path)
+        output = QuestionService.   read_questions_from_docx(self=QuestionService(),file_path=file_path)
         print(output)

@@ -9,7 +9,7 @@ from app.models.models import (
     SituationalAnswer,
     User,
     SituationalUserAnswer,
-    SituationGroup,
+
 )
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
@@ -77,7 +77,7 @@ class SituationalService:
                         next_line = paragraphs[j]
                         # Ngắt khi gặp tiêu đề Level hoặc tiêu đề câu hỏi tiếp theo
                         if re.match(r"^Level\s*\d+", next_line, flags=re.IGNORECASE) or \
-                           re.match(r"^Tình huống", next_line, flags=re.IGNORECASE):
+                                re.match(r"^Tình huống", next_line, flags=re.IGNORECASE):
                             break
                         buffer_lines.append(next_line)
                         j += 1
@@ -162,17 +162,7 @@ class SituationalService:
             3: {"name": "Cha mẹ", "description": "Các tình huống liên quan đến cha mẹ"},
             4: {"name": "Anh em", "description": "Các tình huống liên quan đến anh em"},
         }
-        
-        for group_id, group_data in situation_groups.items():
-            group = db.query(SituationGroup).filter(SituationGroup.id == group_id).first()
-            if not group:
-                group = SituationGroup(
-                    id=group_id,
-                    name=group_data["name"],
-                    description=group_data["description"]
-                )
-                db.add(group)
-        db.commit()
+
 
         data = SituationalService.read_situational_from_files()
         for item in data:

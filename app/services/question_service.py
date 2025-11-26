@@ -1,18 +1,18 @@
 from docx import Document
 import re
 from sqlalchemy.orm import Session
-from app.models.models import Test, Entity, Group, TestAnswer, Option
+from app.models.models import Test, Group, Option
 from typing import List, Dict, Any
 
 
 class QuestionService:
-
-    def read_questions_from_docx(self, file_path: str) -> List[Dict[str, Any]]:
+    @staticmethod
+    def read_questions_from_docx(file_path: str) -> List[Dict[str, Any]]:
         print(f"Đang đọc file: {file_path}")
         questions = []
         doc = Document(file_path)
         lines = [p.text for p in doc.paragraphs]
-        for result in self.parse_questionnaire(lines, type="DASS" if 'DASS' in file_path else 'RADS'):
+        for result in QuestionService.parse_questionnaire(lines, type="DASS" if 'DASS' in file_path else 'RADS'):
             questions.append(result)
 
         return questions
@@ -28,6 +28,7 @@ class QuestionService:
                 group = Group(name=group_name)
                 db.add(group)
                 db.flush()
+
             for q in questions:
                 existing_test = db.query(Test).filter_by(content=q['content'], group_id=group.id).first()
                 if existing_test:
@@ -35,11 +36,12 @@ class QuestionService:
                 test = Test(content=q['content'], group_id=group.id, code=q.get('code'))
                 db.add(test)
                 db.flush()
-                for opt in q['options']:
-                    existing_option = db.query(Option).filter_by(test_id=test.id, content=opt['content'], level=opt['level']).first()
+                for level, content in q['options'].items():
+                    existing_option = db.query(Option).filter_by(test_id=test.id, content=content,
+                                                                 level=level).first()
                     if existing_option:
                         continue
-                    option = Option(test_id=test.id, content=opt['content'], level=opt['level'])
+                    option = Option(test_id=test.id, content=content, level=level)
                     db.add(option)
             db.commit()
         except Exception as e:
@@ -59,78 +61,6 @@ class QuestionService:
             print(f"\nĐang import file {file_path} vào nhóm {test_type}...")
             QuestionService.import_questions_to_db(file_path, test_type, db)
 
-    def parse_dass(self, lines):
-        # Mức điểm cố định
-        options = {
-            0: "Không đúng với tôi chút nào cả",
-            1: "Đúng với tôi phần nào hoặc thỉnh thoảng mới đúng",
-            2: "Đúng với tôi khá nhiều, hoặc hầu hết thời gian",
-            3: "Đúng với tôi hầu hết thời gian, hoặc rất đúng với tôi"
-        }
-
-        # Mapping mã code
-        depression = {3, 5, 10, 13, 16, 17, 21}
-        anxiety = {2, 4, 7, 9, 15, 19, 20}
-        stress = {1, 6, 8, 11, 12, 14, 18}
-
-        results = []
-
-        for line in lines:
-            line = line.strip()
-
-            # Tìm dòng dạng "Đề mục X: Nội dung"
-            match = re.match(r"Đề mục\s+(\d+)\s*:\s*(.*)", line)
-            if match:
-                num = int(match.group(1))
-                content = match.group(2).strip()
-
-                # Xác định code
-                if num in depression:
-                    code_value = "D"
-                elif num in anxiety:
-                    code_value = "A"
-                elif num in stress:
-                    code_value = "S"
-                else:
-                    code_value = None
-
-                # Đẩy item vào list
-                results.append({
-                    'content': content,
-                    'code': code_value,
-                    'options': options
-                })
-
-        return results
-
-    def parse_rads(self, lines):
-        # Mức điểm cố định
-        options = {
-            0: "Hầu như không",
-            1: "Thỉnh thoảng",
-            2: "Phần lớn thời gian",
-            3: "Hầu hết hoặc tất cả thời gian"
-        }
-
-        results = []
-        code_value = None
-        for line in lines:
-            line = line.strip()
-
-            # Tìm dòng dạng "Đề mục X: Nội dung"
-            match = re.match(r"Đề mục\s+(\d+)\s*:\s*(.*)", line)
-            if match:
-                num = int(match.group(1))
-                content = match.group(2).strip()
-
-                # Đẩy item vào list
-                results.append({
-                    'content': content,
-                    'code': code_value,
-                    'options': options
-                })
-
-        return results
     @staticmethod
     def parse_questionnaire(lines, type="DASS"):
         results = []
