@@ -93,18 +93,11 @@ class SituationalService:
             if not question_raw:
                 continue
 
-            # === 1. Xử lý đáp án & giải thích ===
-            explanation = ""
-            answer_main = answer_raw
-
-            if "Giải thích chuyên gia:" in answer_raw:
-                parts = answer_raw.split("Giải thích chuyên gia:", 1)
-                answer_main = parts[0].strip()
-                explanation = "Giải thích chuyên gia:" + parts[1].strip()
+            explanation = answer_raw
 
             # Lấy đáp án đúng (A/B/C/D)
             correct_letter = None
-            text = answer_main.lower()
+            text = explanation.lower()
             for keyword in ["đáp án đúng", "đáp án", "đúng là", "correct", "answer"]:
                 if keyword in text:
                     match = re.search(f"{keyword}[:\s]*([a-d])", text)
@@ -112,25 +105,20 @@ class SituationalService:
                         correct_letter = match.group(1).upper()
                         break
             if not correct_letter:
-                print(f"[KHÔNG TÌM THẤY Đáp án đúng] {answer_main}")
-
-            # === 2. Tạo nội dung câu hỏi đầy đủ ===
-            full_content = question_raw
-            if answer_main:
-                full_content += "\n" + answer_main
-            if explanation:
-                full_content += "\n" + explanation
+                print(f"[KHÔNG TÌM THẤY Đáp án đúng] {explanation}")
 
             # Kiểm tra trùng (content + level)
             if db.query(SituationalQuestion).filter_by(
-                    content=full_content,
+                    content=question_raw,
+                    explanation=explanation,
                     level=level
             ).first():
                 continue
 
             # === 3. Tạo câu hỏi ===
             question = SituationalQuestion(
-                content=full_content,
+                content=question_raw,
+                explanation=explanation,
                 level=level
             )
             db.add(question)
@@ -230,12 +218,7 @@ class SituationalService:
         result = []
         for q in questions:
             q_content = q.content
-            explanation = ""
-
-            if "Giải thích chuyên gia:" in q.content:
-                parts = q.content.split("Giải thích chuyên gia:", 1)
-                q_content = parts[0].strip()
-                explanation = parts[1].strip()
+            explanation = q.explanation
 
             answers = db.query(SituationalAnswer) \
                 .filter(SituationalAnswer.question_id == q.id) \

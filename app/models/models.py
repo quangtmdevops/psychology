@@ -96,6 +96,7 @@ class SituationalQuestion(Base):
 
     id = Column(Integer, primary_key=True)
     content = Column(Text, nullable=False)
+    explanation = Column(Text, nullable=True)
     order = Column(Integer)
     level = Column(Integer, nullable=False)
 
