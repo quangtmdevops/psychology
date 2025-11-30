@@ -51,7 +51,8 @@ async def send_chat(
         return {
             "status": "success",
             "message": ai_response,
-            "remaining_chats": max(0, user.free_chat),
+            # "remaining_chats": max(0, user.free_chat),
+            "remaining_chats": None,
             "is_premium": getattr(user, 'is_premium', False),
             "conversation_id": chat_message.conversation_id
         }
