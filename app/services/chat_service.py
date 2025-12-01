@@ -1,10 +1,11 @@
-from datetime import datetime, date, timedelta, timezone
+from datetime import datetime, date
 import httpx
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.models.models import User
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from app.core.config import Settings
+
 
 settings = Settings()
 CHAT_API_URL = settings.CHAT_API_URL
@@ -16,17 +17,18 @@ def can_send_chat(user: User, db: Session) -> bool:
     Check if user can send a chat message.
     Resets the chat count if it's a new day.
     """
-    # today = date.today()
-    #
-    # # If it's a new day, reset the chat count
-    # if user.last_chat_date is None or user.last_chat_date.date() < today:
-    #     user.free_chat = 3  # Reset to 3 messages per day
-    #     user.last_chat_date = datetime.utcnow()
-    #     db.commit()
-    #
-    # # Check if user has remaining chats
-    # if user.free_chat <= 0:
-    #     return False
+    today = date.today()
+
+    # If it's a new day, reset the chat count
+    if user.last_chat_date is None or user.last_chat_date.date() < today:
+        user.free_chat = 3  # Reset to 3 messages per day
+        user.last_chat_date = datetime.utcnow()
+        db.commit()
+
+    # Check if user has remaining chats
+    if user.free_chat <= 0:
+        return False
+
     return True
 
 
@@ -68,22 +70,25 @@ async def send_chat_message(message: str) -> Dict[str, Any]:
             )
 
 
+import datetime
+
+
 def use_chat_credit(user: User, db: Session) -> bool:
     """
     Deduct one chat credit from the user.
     Returns True if credit was used, False if no credits left.
     """
-    # # Đảm bảo user nằm trong session đúng
-    # user = db.merge(user)
-    # db.refresh(user)
-    #
-    # if user.free_chat <= 0:
-    #     return False
-    #
-    # user.free_chat -= 1
-    # user.last_chat_date = datetime.datetime.now(datetime.UTC)
-    # db.commit()
-    # db.refresh(user)
+    # Đảm bảo user nằm trong session đúng
+    user = db.merge(user)
+    db.refresh(user)
+
+    if user.free_chat <= 0:
+        return False
+
+    user.free_chat -= 1
+    user.last_chat_date = datetime.datetime.now(datetime.UTC)
+    db.commit()
+    db.refresh(user)
     return True
 
 
@@ -95,7 +100,7 @@ def get_remaining_chats(user: User, db: Session) -> dict:
     can_send = can_send_chat(user, db)
 
     return {
-        "remaining_chats": None,  # Ensure non-negative
+        "remaining_chats": max(0, user.free_chat),  # Ensure non-negative
         "can_chat": can_send,
         "is_premium": getattr(user, 'is_premium', False),
         "last_chat_date": user.last_chat_date

@@ -43,7 +43,7 @@ class Settings(BaseSettings):
             return f"sqlite:///{BASE_DIR / (self.DB_NAME + '.db')}"
 
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 # ✅ Khi import module này, Settings sẽ tự đọc .env
 settings = Settings()
