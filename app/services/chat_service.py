@@ -6,11 +6,11 @@ from app.models.models import User
 from typing import Dict, Any, Optional
 from app.core.config import Settings
 
-
 settings = Settings()
 CHAT_API_URL = settings.CHAT_API_URL
 CHAT_API_KEY = settings.CHAT_API_KEY
 DEFAULT_CHAT_MODEL = settings.DEFAULT_CHAT_MODEL
+
 
 def can_send_chat(user: User, db: Session) -> bool:
     """
@@ -70,9 +70,6 @@ async def send_chat_message(message: str) -> Dict[str, Any]:
             )
 
 
-import datetime
-
-
 def use_chat_credit(user: User, db: Session) -> bool:
     """
     Deduct one chat credit from the user.
@@ -86,7 +83,7 @@ def use_chat_credit(user: User, db: Session) -> bool:
         return False
 
     user.free_chat -= 1
-    user.last_chat_date = datetime.datetime.now(datetime.UTC)
+    user.last_chat_date = datetime.utcnow()
     db.commit()
     db.refresh(user)
     return True
